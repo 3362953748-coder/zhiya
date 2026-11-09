@@ -62,7 +62,7 @@ curl -X PUT -H "Authorization: Bearer $TOKEN" \
 
 ```bash
 # 1) 扫全目录（含未跟踪文件）
-grep -rn "wbpk_\|ghp_\|gho_\|sk-\|apiKey\s*=\s*['\"]" . --exclude-dir=node_modules --exclude-dir=.git
+grep -rnE "(密钥前缀1|密钥前缀2|sk-)|apiKey\s*=\s*['\"]" . --exclude-dir=node_modules --exclude-dir=.git
 
 # 2) 建 .gitignore
 cat > .gitignore << 'EOF'
@@ -78,7 +78,7 @@ EOF
 # 3) 建 .env.example 模板（保留键名，不留值）
 cat > .env.example << 'EOF'
 # 云服务公钥，从平台控制台获取
-WB_CLOUD_PUBLISHABLE_KEY=wbpk_在此填入你的公钥
+WB_CLOUD_PUBLISHABLE_KEY=在此填入你的公钥
 WB_CLOUD_ENDPOINT=https://your-app.app.workbuddy.host
 ZHIYA_MODEL=deepseek-v4.1-flash
 PORT=5178
@@ -106,7 +106,7 @@ fi
 ```bash
 rm -rf /tmp/verify && git clone --quiet https://github.com/OWNER/REPO.git /tmp/verify
 cd /tmp/verify
-grep -rn "wbpk_\|ghp_\|gho_" . --exclude-dir=.git && echo "❌ 泄露！" || echo "✅ 零密钥"
+grep -rnE "(密钥前缀1|密钥前缀2)" . --exclude-dir=.git && echo "❌ 泄露！" || echo "✅ 零密钥"
 ls .env.local 2>/dev/null && echo "❌ .env.local 被传" || echo "✅ .env.local 未传"
 ```
 
