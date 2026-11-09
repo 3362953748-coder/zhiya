@@ -9,6 +9,15 @@
 
 本仓库是知涯的 **MVP 实现**：一个能真跑大模型、能在浏览器里完整操作、并且**用服务端代码兜住 AI 幻觉**的产品。
 
+<p align="center">
+  <img src="docs/images/01-home.png" width="300" alt="知涯首页">
+</p>
+
+<p align="center">
+  <a href="https://zhiya-career.app.workbuddy.host/?sharecode=WVJRC4JK5Y">在线作品集主页 →</a>
+　·　<a href="docs/可用性测试报告_V2.0.docx">下载可用性测试报告（缺陷定位与修复前后对比）→</a>
+</p>
+
 ---
 
 ## 这个项目在证明什么
@@ -44,6 +53,21 @@
 
 ## 三分钟看到产品
 
+<div align="center">
+  <img src="docs/images/03-directions.png" width="220" alt="岗位方向">
+  <img src="docs/images/04-gap.png" width="220" alt="能力差距">
+  <img src="docs/images/05-plan.png" width="220" alt="两周行动计划">
+</div>
+
+<p align="center">
+  <em>左：AI 给出的岗位方向与匹配依据　中：能力差距三分类　右：两周行动计划</em>
+</p>
+
+截图取自 **2026-11-09 修复后的真实模型产出**（5 个不同专业被测者之一），
+不是设计稿。中屏的「功能设计与迭代」被判为**待提升**——
+用户参与过课程项目的接口与数据库设计，但项目规模小、未体现需求分析与迭代优化的完整流程，
+所以判「沾边但不够」而非「已有」或「信息不足」。
+
 ### 方式一：离线单文件版（不需要服务器、不需要网络）
 
 下载仓库后双击 `demo-offline.html`（已随仓库提供，快照已内联），
@@ -78,6 +102,19 @@ bash start.sh                 # Windows Git Bash / macOS / Linux
 | 《知涯 · 产品定位文档》 | 定位、场景、版本范围、成功指标与反向指标 |
 | 《知涯 PRD V0.4》 | 10 章 + 50 条 Given-When-Then 验收标准 + 9 个埋点事件 |
 | 《可用性测试报告 V1.0 / V2.0》 | 缺陷定位与修复前后对比（含代码行级根因分析） |
+
+### 仓库内可直接下载
+
+| 文件 | 说明 |
+| --- | --- |
+| [`docs/可用性测试报告_V2.0.docx`](docs/可用性测试报告_V2.0.docx) | 正式版报告（封面 / 目录 / 页码齐全，含前后对比表） |
+| [`docs/可用性测试报告_V2.0.md`](docs/可用性测试报告_V2.0.md) | 同上，纯文本版，便于直接阅读与检索 |
+| [`docs/修复闭环说明.md`](docs/修复闭环说明.md) | 一页版修复闭环说明：根因、改法、验证数据 |
+| [`docs/v1-v2-对比数据.json`](docs/v1-v2-对比数据.json) | 修复前后的原始指标对比（可自行复核） |
+
+> 其余四份产品文档（用户调研 / 竞品分析 / 产品决策书 / 定位文档 / PRD）
+> 收录在[在线作品集主页](https://zhiya-career.app.workbuddy.host/?sharecode=WVJRC4JK5Y)的文档索引中，
+> PRD 可在该页直接下载。
 
 ---
 

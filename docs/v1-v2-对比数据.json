@@ -1,0 +1,185 @@
+{
+  "generated_at": "2026-11-08",
+  "headline": {
+    "improve": {
+      "before": 0,
+      "after": 12
+    },
+    "have": {
+      "before": 22,
+      "after": 23
+    },
+    "unknown": {
+      "before": 19,
+      "after": 10
+    },
+    "false_positive": {
+      "before": 2,
+      "after": 0
+    },
+    "findings_total": {
+      "before": 15,
+      "after": 4
+    },
+    "unit_tests": {
+      "before": 129,
+      "after": 149
+    },
+    "product_tests": {
+      "before": "225/225",
+      "after": "225/225"
+    }
+  },
+  "by_subject": [
+    {
+      "id": "T1",
+      "name": "被测者 T1",
+      "code": "技术研发族",
+      "v1": {
+        "have": 4,
+        "improve": 0,
+        "unknown": 4,
+        "total": 8,
+        "tasks": 6,
+        "findings": 3
+      },
+      "v2": {
+        "have": 4,
+        "improve": 1,
+        "unknown": 5,
+        "total": 10,
+        "tasks": 8,
+        "findings": 0
+      }
+    },
+    {
+      "id": "T2",
+      "name": "被测者 T2",
+      "code": "运营族",
+      "v1": {
+        "have": 6,
+        "improve": 0,
+        "unknown": 2,
+        "total": 8,
+        "tasks": 4,
+        "findings": 2
+      },
+      "v2": {
+        "have": 6,
+        "improve": 2,
+        "unknown": 0,
+        "total": 8,
+        "tasks": 3,
+        "findings": 1
+      }
+    },
+    {
+      "id": "T3",
+      "name": "被测者 T3",
+      "code": "创意设计族",
+      "v1": {
+        "have": 4,
+        "improve": 0,
+        "unknown": 3,
+        "total": 7,
+        "tasks": 8,
+        "findings": 4
+      },
+      "v2": {
+        "have": 4,
+        "improve": 2,
+        "unknown": 2,
+        "total": 8,
+        "tasks": 7,
+        "findings": 1
+      }
+    },
+    {
+      "id": "T4",
+      "name": "被测者 T4",
+      "code": "产品项目族",
+      "v1": {
+        "have": 3,
+        "improve": 0,
+        "unknown": 8,
+        "total": 11,
+        "tasks": 7,
+        "findings": 3
+      },
+      "v2": {
+        "have": 3,
+        "improve": 6,
+        "unknown": 2,
+        "total": 11,
+        "tasks": 5,
+        "findings": 0
+      }
+    },
+    {
+      "id": "T5",
+      "name": "被测者 T5",
+      "code": "职能支持族",
+      "v1": {
+        "have": 5,
+        "improve": 0,
+        "unknown": 2,
+        "total": 7,
+        "tasks": 5,
+        "findings": 3
+      },
+      "v2": {
+        "have": 6,
+        "improve": 1,
+        "unknown": 1,
+        "total": 8,
+        "tasks": 5,
+        "findings": 2
+      }
+    }
+  ],
+  "finding_count": {
+    "before": {
+      "D1": 5,
+      "D2": 2,
+      "D7": 4,
+      "D4": 1,
+      "D5": 1,
+      "D3": 1,
+      "D6": 1
+    },
+    "after": {
+      "D7": 3,
+      "D6": 1
+    }
+  },
+  "remaining": [
+    {
+      "subject": "T2",
+      "id": "D7",
+      "sev": "medium",
+      "title": "6 项差距没有对应任务，用户看到\"差距\"却拿不到\"怎么做\"",
+      "cat": "内容完整性"
+    },
+    {
+      "subject": "T3",
+      "id": "D7",
+      "sev": "medium",
+      "title": "4 项差距没有对应任务，用户看到\"差距\"却拿不到\"怎么做\"",
+      "cat": "内容完整性"
+    },
+    {
+      "subject": "T5",
+      "id": "D6",
+      "sev": "low",
+      "title": "P0 任务由\"已有\"能力生成，优先级语义错位",
+      "cat": "产品逻辑"
+    },
+    {
+      "subject": "T5",
+      "id": "D7",
+      "sev": "medium",
+      "title": "4 项差距没有对应任务，用户看到\"差距\"却拿不到\"怎么做\"",
+      "cat": "内容完整性"
+    }
+  ]
+}
