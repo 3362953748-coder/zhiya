@@ -10,12 +10,12 @@
 本仓库是知涯的 **MVP 实现**：一个能真跑大模型、能在浏览器里完整操作、并且**用服务端代码兜住 AI 幻觉**的产品。
 
 <p align="center">
-  <img src="docs/images/01-home.png" width="300" alt="知涯首页">
+  <img src="docs/diagrams/prototype/01-home.png" width="300" alt="知涯首页">
 </p>
 
 <p align="center">
   <a href="https://zhiya-career.app.workbuddy.host/?sharecode=WVJRC4JK5Y">在线作品集主页 →</a>
-　·　<a href="docs/可用性测试报告_V2.0.docx">下载可用性测试报告（缺陷定位与修复前后对比）→</a>
+　·　<a href="docs/Usability-Test-Report-V2.0.docx">下载可用性测试报告（缺陷定位与修复前后对比）→</a>
 </p>
 
 ---
@@ -54,9 +54,9 @@
 ## 三分钟看到产品
 
 <div align="center">
-  <img src="docs/images/03-directions.png" width="220" alt="岗位方向">
-  <img src="docs/images/04-gap.png" width="220" alt="能力差距">
-  <img src="docs/images/05-plan.png" width="220" alt="两周行动计划">
+  <img src="docs/diagrams/prototype/04-directions.png" width="220" alt="岗位方向">
+  <img src="docs/diagrams/prototype/05-gap.png" width="220" alt="能力差距">
+  <img src="docs/diagrams/prototype/06-plan.png" width="220" alt="两周行动计划">
 </div>
 
 <p align="center">
@@ -92,30 +92,58 @@ bash start.sh                 # Windows Git Bash / macOS / Linux
 
 ---
 
-## 完整文档在作品集里
+## 完整文档与图示（全部可下载）
 
-| 文档 | 内容 |
-| --- | --- |
-| 《知涯 · 用户调研报告》 | 4 名在校生深度访谈，5 条核心洞察，12 项痛点编码 |
-| 《知涯 · 竞品分析报告》 | 5 款代表性竞品，16 维功能矩阵，战略象限定位 |
-| 《知涯 · 产品决策书》 | 三个核心问题的收敛答案，每条决策可回溯到具体访谈证据 |
-| 《知涯 · 产品定位文档》 | 定位、场景、版本范围、成功指标与反向指标 |
-| 《知涯 PRD V0.4》 | 10 章 + 50 条 Given-When-Then 验收标准 + 9 个埋点事件 |
-| 《可用性测试报告 V1.0 / V2.0》 | 缺陷定位与修复前后对比（含代码行级根因分析） |
+### 产品定义 —— 从洞察到 PRD 的完整链路
 
-### 仓库内可直接下载
+| 文档 | 内容 | 规模 |
+| --- | --- | --- |
+| [《知涯 · 用户调研报告》](docs/product-docs/01-User-Research-Report.docx) | 4 名在校生深度访谈，5 条核心洞察，12 项痛点编码 | 6800 字 · 4 表 |
+| [《知涯 · 竞品分析报告》](docs/product-docs/04-Competitive-Analysis.docx) | 5 款代表性竞品，16 维功能矩阵，「广度 × 深度」战略象限定位 | 12000 字 · 16 表 |
+| [《知涯 · 产品决策书》](docs/product-docs/02-Product-Decision-Book.docx) | 三个核心问题的收敛答案，每条决策可回溯到具体访谈证据 | 11500 字 · 25 表 |
+| [《知涯 · 产品定位文档》](docs/product-docs/03-Product-Positioning.docx) | 目标用户、核心场景、需求优先级、MVP 范围与验证指标 | 16180 字 · 38 表 |
+| [《知涯 PRD V0.5》](docs/product-docs/05-PRD-V0.5.docx) | 10 章 + 50 条 Given-When-Then 验收标准 + 14 条业务规则 + 9 个埋点事件 | 22300 字 · 78 表 |
+
+### 质量验证 —— 缺陷定位与修复闭环
 
 | 文件 | 说明 |
 | --- | --- |
-| [`docs/可用性测试报告_V2.0.docx`](docs/可用性测试报告_V2.0.docx) | 正式版报告（封面 / 目录 / 页码齐全，含前后对比表） |
-| [`docs/可用性测试报告_V2.0.md`](docs/可用性测试报告_V2.0.md) | 同上，纯文本版，便于直接阅读与检索 |
-| [`docs/修复闭环说明.md`](docs/修复闭环说明.md) | 一页版修复闭环说明：根因、改法、验证数据 |
-| [`docs/v1-v2-对比数据.json`](docs/v1-v2-对比数据.json) | 修复前后的原始指标对比（可自行复核） |
-| [`docs/GitHub作品集搭建指南.md`](docs/GitHub作品集搭建指南.md) | 本次开源实践沉淀的方法论：密钥审计、提交历史组织、死链检查、5 个真实坑位 |
+| [可用性测试报告 V2.0（Word）](docs/Usability-Test-Report-V2.0.docx) | 正式版：封面 / 目录 / 页码齐全，含修复前后对比表 |
+| [可用性测试报告 V2.0（Markdown）](docs/Usability-Test-Report-V2.0.md) | 同上纯文本版，便于检索与阅读 |
+| [修复闭环说明](docs/fix-closure.md) | 一页版：根因、改法、验证数据 |
+| [V1/V2 对比数据](docs/v1-v2-对比数据.json) | 修复前后原始指标，可自行复核 |
+| [GitHub 作品集搭建指南](docs/GitHub作品集搭建指南.md) | 本次开源实践的方法论沉淀，含 6 个真实坑位与 17 项检查清单 |
 
-> 其余四份产品文档（用户调研 / 竞品分析 / 产品决策书 / 定位文档 / PRD）
-> 收录在[在线作品集主页](https://zhiya-career.app.workbuddy.host/?sharecode=WVJRC4JK5Y)的文档索引中，
-> PRD 可在该页直接下载。
+### 图示 —— 全部为矢量重绘，无第三方水印
+
+| 图 | 说明 |
+| --- | --- |
+| [功能架构图](docs/diagrams/architecture.png) | 四步串行管线 + 模型服务层 + 服务端强校验层 ｜ [SVG 源文件](docs/diagrams/architecture.svg) |
+| [用户流程图](docs/diagrams/userflow.png) | 八屏主流程 + 贯穿全流程的诚实性机制 + 实测数据 ｜ [SVG 源文件](docs/diagrams/userflow.svg) |
+
+<p align="center">
+  <img src="docs/diagrams/architecture.png" width="820" alt="功能架构图">
+</p>
+
+<p align="center">
+  <img src="docs/diagrams/userflow.png" width="820" alt="用户流程图">
+</p>
+
+### 原型界面（8 屏实机截图）
+
+<p align="center">
+  <img src="docs/diagrams/prototype/01-home.png" width="150" alt="首页">
+  <img src="docs/diagrams/prototype/02-input.png" width="150" alt="背景录入">
+  <img src="docs/diagrams/prototype/03-ask-modal.png" width="150" alt="追问弹窗">
+  <img src="docs/diagrams/prototype/04-directions.png" width="150" alt="岗位方向">
+</p>
+
+<p align="center">
+  <img src="docs/diagrams/prototype/05-gap.png" width="150" alt="能力差距">
+  <img src="docs/diagrams/prototype/06-plan.png" width="150" alt="两周计划">
+  <img src="docs/diagrams/prototype/07-confirm.png" width="150" alt="确认行动">
+  <img src="docs/diagrams/prototype/08-ask-expanded.png" width="150" alt="展开追问区">
+</p>
 
 ---
 

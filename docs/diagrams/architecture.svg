@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1120" viewBox="0 0 1400 1120" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#B08585"/>
+    </marker>
+    <marker id="arS" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A9A29C"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="1120" fill="#F6F1E9"/>
+
+  <!-- 标题 -->
+  <text x="700" y="62" text-anchor="middle" font-size="30" font-weight="700" fill="#3E3A3A">知涯 ZHIYA · 功能架构</text>
+  <text x="700" y="96" text-anchor="middle" font-size="16" fill="#8C8585">四步串行 AI 管线 · 每一步的输出是下一步的输入 · 服务端强校验兜底 AI 幻觉</text>
+  <line x1="120" y1="118" x2="1280" y2="118" stroke="#D5C9B6" stroke-width="1.5"/>
+
+  <!-- 图例 -->
+  <g>
+    <rect x="120" y="136" width="18" height="18" rx="4" fill="#C99C9C"/>
+    <text x="146" y="150" font-size="13" fill="#8C8585">核心模块</text>
+    <rect x="240" y="136" width="18" height="18" rx="4" fill="#EDE6DA" stroke="#D5C9B6"/>
+    <text x="266" y="150" font-size="13" fill="#8C8585">支撑模块</text>
+    <rect x="360" y="136" width="18" height="18" rx="4" fill="#E7EBEE"/>
+    <text x="386" y="150" font-size="13" fill="#8C8585">模型服务</text>
+    <rect x="480" y="136" width="18" height="18" rx="4" fill="#E8EDE7"/>
+    <text x="506" y="150" font-size="13" fill="#8C8585">前端</text>
+  </g>
+
+  <!-- 输入层 -->
+  <rect x="120" y="182" width="270" height="74" rx="10" fill="#FCF9F4" stroke="#D5C9B6" stroke-width="1"/>
+  <text x="255" y="210" text-anchor="middle" font-size="15" font-weight="700" fill="#3E3A3A">用户输入</text>
+  <text x="255" y="234" text-anchor="middle" font-size="12" fill="#8C8585">口述经历 · 目标岗位 JD · 每周可投入时间</text>
+
+  <!-- 前端 -->
+  <rect x="1010" y="182" width="270" height="74" rx="10" fill="#E8EDE7" stroke="#9AA393" stroke-width="1"/>
+  <text x="1145" y="210" text-anchor="middle" font-size="15" font-weight="700" fill="#3E3A3A">前端 8 屏</text>
+  <text x="1145" y="234" text-anchor="middle" font-size="12" fill="#6B6B63">录入 · 追问 · 方向 · 差距 · 计划</text>
+
+  <!-- 主流程四步 -->
+  <g>
+    <!-- step1 -->
+    <rect x="120" y="300" width="270" height="128" rx="12" fill="#FCF9F4" stroke="#C99C9C" stroke-width="1.5"/>
+    <rect x="120" y="300" width="270" height="30" rx="12" fill="#C99C9C"/>
+    <rect x="120" y="318" width="270" height="12" fill="#C99C9C"/>
+    <text x="140" y="321" font-size="14" font-weight="700" fill="#FCF9F4">① 经历解析</text>
+    <text x="140" y="352" font-size="12" fill="#5C5552">prompts.js · profile</text>
+    <text x="140" y="374" font-size="12" fill="#8C8585">从口述中抽技能、经历、证据</text>
+    <text x="140" y="394" font-size="12" fill="#8C8585">原文片段可回指</text>
+    <text x="140" y="414" font-size="12" fill="#8C8585">学历 / 专业 / 年级结构化</text>
+
+    <!-- step2 -->
+    <rect x="440" y="300" width="270" height="128" rx="12" fill="#FCF9F4" stroke="#C99C9C" stroke-width="1.5"/>
+    <rect x="440" y="300" width="270" height="30" rx="12" fill="#C99C9C"/>
+    <rect x="440" y="318" width="270" height="12" fill="#C99C9C"/>
+    <text x="460" y="321" font-size="14" font-weight="700" fill="#FCF9F4">② 岗位拆解</text>
+    <text x="460" y="352" font-size="12" fill="#5C5552">prompts.js · jd_profile</text>
+    <text x="460" y="374" font-size="12" fill="#8C8585">JD 拆成可逐条对照的要求项</text>
+    <text x="460" y="394" font-size="12" fill="#8C8585">每项带原文证据与重要度</text>
+    <text x="460" y="414" font-size="12" fill="#8C8585">名实分离防护</text>
+
+    <!-- step3 -->
+    <rect x="760" y="300" width="270" height="128" rx="12" fill="#FCF9F4" stroke="#C99C9C" stroke-width="1.5"/>
+    <rect x="760" y="300" width="270" height="30" rx="12" fill="#C99C9C"/>
+    <rect x="760" y="318" width="270" height="12" fill="#C99C9C"/>
+    <text x="780" y="321" font-size="14" font-weight="700" fill="#FCF9F4">③ 差距对照</text>
+    <text x="780" y="352" font-size="12" fill="#5C5552">validate.js · gap_report</text>
+    <text x="780" y="374" font-size="12" fill="#8C8585">已有 / 待提升 / 信息不足</text>
+    <text x="780" y="394" font-size="12" fill="#8C8585">三分类互斥且穷尽</text>
+    <text x="780" y="414" font-size="12" fill="#8C8585">追问生成可一句话回答</text>
+
+    <!-- step4 -->
+    <rect x="1010" y="300" width="270" height="128" rx="12" fill="#FCF9F4" stroke="#C99C9C" stroke-width="1.5"/>
+    <rect x="1010" y="300" width="270" height="30" rx="12" fill="#C99C9C"/>
+    <rect x="1010" y="318" width="270" height="12" fill="#C99C9C"/>
+    <text x="1030" y="321" font-size="14" font-weight="700" fill="#FCF9F4">④ 计划生成</text>
+    <text x="1030" y="352" font-size="12" fill="#5C5552">validate.js · action_plan</text>
+    <text x="1030" y="374" font-size="12" fill="#8C8585">两周内做得完</text>
+    <text x="1030" y="394" font-size="12" fill="#8C8585">每任务带产出物与完成标准</text>
+    <text x="1030" y="414" font-size="12" fill="#8C8585">按依赖图定向重算</text>
+  </g>
+
+  <!-- 步骤间箭头 -->
+  <line x1="392" y1="364" x2="434" y2="364" stroke="#B08585" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="712" y1="364" x2="754" y2="364" stroke="#B08585" stroke-width="2" marker-end="url(#ar)"/>
+  <line x1="1032" y1="364" x2="1004" y2="364" stroke="#B08585" stroke-width="2" marker-end="url(#ar)"/>
+
+  <!-- 输入到step1 -->
+  <line x1="255" y1="256" x2="255" y2="294" stroke="#A9A29C" stroke-width="1.6" marker-end="url(#arS)"/>
+  <text x="265" y="280" font-size="11" fill="#8C8585">POST /api/analysis</text>
+
+  <!-- 前端到step4 -->
+  <path d="M1145,256 L1145,294" stroke="#A9A29C" stroke-width="1.6" fill="none" marker-end="url(#arS)"/>
+  <path d="M1145,428 L1145,470 L255,470 L255,434" stroke="#A9A29C" stroke-width="1.6" fill="none" marker-end="url(#arS)"/>
+  <text x="690" y="464" font-size="11" fill="#8C8585" text-anchor="middle">四段结果一次性返回</text>
+
+  <!-- 模型服务层 -->
+  <rect x="120" y="510" width="1160" height="118" rx="12" fill="#E7EBEE" stroke="#93A0AC" stroke-width="1"/>
+  <text x="145" y="540" font-size="15" font-weight="700" fill="#3E3A3A">模型服务层</text>
+  <text x="145" y="562" font-size="12" fill="#5C6B76">cloud.js · WorkBuddy 云服务 · deepseek-v4.1-flash · 四步串行约 25 秒</text>
+
+  <rect x="145" y="576" width="250" height="36" rx="7" fill="#FCF9F4" stroke="#93A0AC"/>
+  <text x="270" y="599" text-anchor="middle" font-size="12" fill="#3E3A3A">指数退避重试（网络抖动）</text>
+
+  <rect x="415" y="576" width="250" height="36" rx="7" fill="#FCF9F4" stroke="#93A0AC"/>
+  <text x="540" y="599" text-anchor="middle" font-size="12" fill="#3E3A3A">按依赖图定向重算（F6）</text>
+
+  <rect x="685" y="576" width="270" height="36" rx="7" fill="#FCF9F4" stroke="#93A0AC"/>
+  <text x="820" y="599" text-anchor="middle" font-size="12" fill="#3E3A3A">提示词约束（第一层防线）</text>
+
+  <rect x="975" y="576" width="280" height="36" rx="7" fill="#FCF9F4" stroke="#93A0AC"/>
+  <text x="1115" y="599" text-anchor="middle" font-size="12" fill="#3E3A3A">服务端强校验（第二层 · 兜底）</text>
+
+  <!-- 校验层详情 -->
+  <rect x="120" y="664" width="1160" height="230" rx="12" fill="#EDE6DA" stroke="#D5C9B6" stroke-width="1"/>
+  <text x="145" y="694" font-size="15" font-weight="700" fill="#3E3A3A">服务端强校验层　validate.js　——「AI 不编造用户经历」在工程侧唯一的落点</text>
+  <text x="145" y="716" font-size="12" fill="#8C8585">提示词只是第一层，代码才是兜底。规则优先级：证据回指 &gt; 其余所有规则 —— 因证据问题被降级的条目，不得被任何一致性规则改回。</text>
+
+  <g font-size="12.5" fill="#4A4544">
+    <rect x="145" y="734" width="352" height="68" rx="8" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="163" y="757" font-weight="700" fill="#3E3A3A">证据回指</text>
+    <text x="163" y="778" fill="#8C8585">已有类的证据必须能在用户原文中找到，</text>
+    <text x="163" y="795" fill="#8C8585">否则强制降级为「信息不足」并清空证据</text>
+
+    <rect x="513" y="734" width="352" height="68" rx="8" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="531" y="757" font-weight="700" fill="#3E3A3A">语义相关度</text>
+    <text x="531" y="778" fill="#8C8585">证据在原文里 ≠ 证据支撑这条能力。</text>
+    <text x="531" y="795" fill="#8C8585">「MySQL」不能证明「大模型 API 经验」</text>
+
+    <rect x="881" y="734" width="352" height="68" rx="8" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="899" y="757" font-weight="700" fill="#3E3A3A">元话语拦截</text>
+    <text x="899" y="778" fill="#8C8585">「依据中已明确说明」这类模型转述</text>
+    <text x="899" y="795" fill="#8C8585">不能当作用户原话当证据</text>
+
+    <rect x="145" y="812" width="352" height="68" rx="8" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="163" y="835" font-weight="700" fill="#3E3A3A">名实分离防护</text>
+    <text x="163" y="856" fill="#8C8585">岗位要求的名称与证据不对应时，</text>
+    <text x="163" y="873" fill="#8C8585">拒绝规范化，以证据原文为准</text>
+
+    <rect x="513" y="812" width="352" height="68" rx="8" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="531" y="835" font-weight="700" fill="#3E3A3A">确定性规则</text>
+    <text x="531" y="856" fill="#8C8585">学历 / 专业 / 工具 / 竞赛等客观事实</text>
+    <text x="531" y="873" fill="#8C8585">由服务端直接判定，不交给模型</text>
+
+    <rect x="881" y="812" width="352" height="68" rx="8" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="899" y="835" font-weight="700" fill="#3E3A3A">逻辑一致性</text>
+    <text x="899" y="856" fill="#8C8585">依据承认具备却判信息不足 → 改判，</text>
+    <text x="899" y="873" fill="#8C8585">但改判必须找到真实原文支撑</text>
+  </g>
+
+  <!-- 底部支撑 -->
+  <rect x="120" y="930" width="560" height="96" rx="12" fill="#FCF9F4" stroke="#D5C9B6" stroke-width="1"/>
+  <text x="145" y="958" font-size="14" font-weight="700" fill="#3E3A3A">输入清洗　sanitize.js</text>
+  <text x="145" y="980" font-size="12" fill="#8C8585">参数归一化 · 长度上限 · 提示词注入剥离 · 空白输入拦截</text>
+  <text x="145" y="1000" font-size="12" fill="#8C8585">异常输入返回可执行的下一步，而非堆栈</text>
+
+  <rect x="700" y="930" width="580" height="96" rx="12" fill="#FCF9F4" stroke="#D5C9B6" stroke-width="1"/>
+  <text x="725" y="958" font-size="14" font-weight="700" fill="#3E3A3A">测试体系　149 项单元测试 + 225 项产品测试 + 浏览器回归</text>
+  <text x="725" y="980" font-size="12" fill="#8C8585">L1 参数层（mock，秒级） · L2 端到端层（真调模型）</text>
+  <text x="725" y="1000" font-size="12" fill="#8C8585">真实性测试主动构造 7 个陷阱，看模型会不会咬</text>
+
+  <text x="700" y="1090" text-anchor="middle" font-size="12" fill="#A9A29C">知涯 ZHIYA · 面向大学生的 AI 职业探索与求职成长伙伴</text>
+</svg>

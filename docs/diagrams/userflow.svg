@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1180" viewBox="0 0 1400 1180" font-family="Microsoft YaHei, PingFang SC, sans-serif">
+  <defs>
+    <marker id="fa" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#B08585"/>
+    </marker>
+    <marker id="fs" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#A9A29C"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="1180" fill="#F6F1E9"/>
+
+  <text x="700" y="60" text-anchor="middle" font-size="30" font-weight="700" fill="#3E3A3A">知涯 ZHIYA · 用户主流程</text>
+  <text x="700" y="94" text-anchor="middle" font-size="16" fill="#8C8585">从「我做过什么」到「这两周做得完」—— 八屏，每一屏都有明确的下一步</text>
+  <line x1="120" y1="116" x2="1280" y2="116" stroke="#D5C9B6" stroke-width="1.5"/>
+
+  <!-- 泳道标题 -->
+  <g font-size="13" fill="#8C8585">
+    <text x="120" y="152" font-weight="700" fill="#3E3A3A">用户动作</text>
+    <text x="120" y="196">屏幕</text>
+    <text x="120" y="240">系统行为</text>
+    <text x="120" y="284">产出</text>
+  </g>
+  <line x1="120" y1="164" x2="1280" y2="164" stroke="#EDE6DA"/>
+  <line x1="120" y1="208" x2="1280" y2="208" stroke="#EDE6DA"/>
+  <line x1="120" y1="252" x2="1280" y2="252" stroke="#EDE6DA"/>
+
+  <!-- 步骤 1 -->
+  <g>
+    <circle cx="205" cy="152" r="17" fill="#C99C9C"/>
+    <text x="205" y="158" text-anchor="middle" font-size="15" font-weight="700" fill="#FCF9F4">1</text>
+    <text x="238" y="158" font-size="14" fill="#3E3A3A">「开始探索我的方向」</text>
+
+    <rect x="238" y="176" width="150" height="28" rx="6" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="313" y="195" text-anchor="middle" font-size="12" fill="#3E3A3A">01 首页</text>
+    <rect x="404" y="176" width="150" height="28" rx="6" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="479" y="195" text-anchor="middle" font-size="12" fill="#3E3A3A">02 背景录入</text>
+
+    <rect x="238" y="216" width="316" height="30" rx="6" fill="#EDE6DA"/>
+    <text x="396" y="236" text-anchor="middle" font-size="12" fill="#5C5552">校验字数与 JD 长度，未达标不放行</text>
+
+    <rect x="238" y="260" width="316" height="28" rx="6" fill="#EADCD8"/>
+    <text x="396" y="279" text-anchor="middle" font-size="12" fill="#8C5F5F">一份口述经历 + 一段目标 JD</text>
+  </g>
+
+  <!-- 步骤 2 -->
+  <g>
+    <circle cx="205" cy="350" r="17" fill="#C99C9C"/>
+    <text x="205" y="356" text-anchor="middle" font-size="15" font-weight="700" fill="#FCF9F4">2</text>
+    <text x="238" y="356" font-size="14" fill="#3E3A3A">AI 追问「想再确认两件事」</text>
+
+    <rect x="238" y="374" width="150" height="28" rx="6" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="313" y="393" text-anchor="middle" font-size="12" fill="#3E3A3A">03 追问弹窗</text>
+
+    <rect x="238" y="414" width="316" height="30" rx="6" fill="#EDE6DA"/>
+    <text x="396" y="434" text-anchor="middle" font-size="12" fill="#5C5552">问题必须能用一句话回答，答完即证据</text>
+
+    <rect x="238" y="458" width="316" height="28" rx="6" fill="#EADCD8"/>
+    <text x="396" y="477" text-anchor="middle" font-size="12" fill="#8C5F5F">可投递的证据（带原文片段）</text>
+  </g>
+
+  <!-- 步骤 3 -->
+  <g>
+    <circle cx="205" cy="548" r="17" fill="#C99C9C"/>
+    <text x="205" y="554" text-anchor="middle" font-size="15" font-weight="700" fill="#FCF9F4">3</text>
+    <text x="238" y="554" font-size="14" fill="#3E3A3A">对照岗位逐条判断</text>
+
+    <rect x="238" y="572" width="150" height="28" rx="6" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="313" y="591" text-anchor="middle" font-size="12" fill="#3E3A3A">04 岗位方向</text>
+    <rect x="404" y="572" width="150" height="28" rx="6" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="479" y="591" text-anchor="middle" font-size="12" fill="#3E3A3A">05 能力差距</text>
+
+    <rect x="238" y="612" width="316" height="30" rx="6" fill="#EDE6DA"/>
+    <text x="396" y="632" text-anchor="middle" font-size="12" fill="#5C5552">已有 / 待提升 / 信息不足，三分类互斥</text>
+
+    <rect x="238" y="656" width="316" height="28" rx="6" fill="#EADCD8"/>
+    <text x="396" y="675" text-anchor="middle" font-size="12" fill="#8C5F5F">可探索的岗位方向 + 差距清单</text>
+  </g>
+
+  <!-- 步骤 4 -->
+  <g>
+    <circle cx="205" cy="746" r="17" fill="#C99C9C"/>
+    <text x="205" y="752" text-anchor="middle" font-size="15" font-weight="700" fill="#FCF9F4">4</text>
+    <text x="238" y="752" font-size="14" fill="#3E3A3A">生成两周计划</text>
+
+    <rect x="238" y="770" width="150" height="28" rx="6" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="313" y="789" text-anchor="middle" font-size="12" fill="#3E3A3A">06 两周计划</text>
+    <rect x="404" y="770" width="150" height="28" rx="6" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="479" y="789" text-anchor="middle" font-size="12" fill="#3E3A3A">07 确认行动</text>
+
+    <rect x="238" y="810" width="316" height="30" rx="6" fill="#EDE6DA"/>
+    <text x="396" y="830" text-anchor="middle" font-size="12" fill="#5C5552">按每周可投入时间分配，可勾选调整</text>
+
+    <rect x="238" y="854" width="316" height="28" rx="6" fill="#EADCD8"/>
+    <text x="396" y="873" text-anchor="middle" font-size="12" fill="#8C5F5F">带产出物与完成标准的任务清单</text>
+  </g>
+
+  <!-- 步骤 5 -->
+  <g>
+    <circle cx="205" cy="944" r="17" fill="#C99C9C"/>
+    <text x="205" y="950" text-anchor="middle" font-size="15" font-weight="700" fill="#FCF9F4">5</text>
+    <text x="238" y="950" font-size="14" fill="#3E3A3A">执行与复盘</text>
+
+    <rect x="238" y="968" width="150" height="28" rx="6" fill="#FCF9F4" stroke="#D5C9B6"/>
+    <text x="313" y="987" text-anchor="middle" font-size="12" fill="#3E3A3A">08 开始执行</text>
+
+    <rect x="238" y="1008" width="316" height="30" rx="6" fill="#EDE6DA"/>
+    <text x="396" y="1028" text-anchor="middle" font-size="12" fill="#5C5552">产出物可写进简历，缺口可重新生成计划</text>
+
+    <rect x="238" y="1052" width="316" height="28" rx="6" fill="#EADCD8"/>
+    <text x="396" y="1071" text-anchor="middle" font-size="12" fill="#8C5F5F">两周后能力差距缩小一圈</text>
+  </g>
+
+  <!-- 主干箭头 -->
+  <line x1="205" y1="169" x2="205" y2="333" stroke="#B08585" stroke-width="2" marker-end="url(#fa)"/>
+  <line x1="205" y1="367" x2="205" y2="531" stroke="#B08585" stroke-width="2" marker-end="url(#fa)"/>
+  <line x1="205" y1="565" x2="205" y2="729" stroke="#B08585" stroke-width="2" marker-end="url(#fa)"/>
+  <line x1="205" y1="763" x2="205" y2="927" stroke="#B08585" stroke-width="2" marker-end="url(#fa)"/>
+
+  <!-- 右侧：诚实性机制 -->
+  <rect x="620" y="176" width="660" height="904" rx="14" fill="#FCF9F4" stroke="#D5C9B6" stroke-width="1.2"/>
+  <text x="950" y="210" text-anchor="middle" font-size="17" font-weight="700" fill="#3E3A3A">贯穿全流程的诚实性机制</text>
+  <text x="950" y="234" text-anchor="middle" font-size="12.5" fill="#8C8585">产品的核心承诺：AI 不替你编造经历，只帮助你看见更多可能</text>
+  <line x1="650" y1="252" x2="1250" y2="252" stroke="#EDE6DA"/>
+
+  <g font-size="12.5" fill="#4A4544">
+    <rect x="650" y="272" width="600" height="76" rx="9" fill="#EDE6DA"/>
+    <text x="672" y="298" font-weight="700" fill="#3E3A3A" font-size="14">「信息不足」不等于「不具备」</text>
+    <text x="672" y="320" fill="#8C8585">用户没提供 ≠ 用户不会。三分类互斥且穷尽，「待提升」必须有</text>
+    <text x="672" y="338" fill="#8C8585">明确岗位要求依据，且给出具体可执行建议，不是「多练习」这种空话。</text>
+
+    <rect x="650" y="362" width="600" height="76" rx="9" fill="#EDE6DA"/>
+    <text x="672" y="388" font-weight="700" fill="#3E3A3A" font-size="14">每条结论都能回指到原文</text>
+    <text x="672" y="410" fill="#8C8585">「已有」必须有经历原文片段作为证据。证据回指失败 → 强制降级为</text>
+    <text x="672" y="428" fill="#8C8585">「信息不足」并清空证据。降级后的条目不得被任何规则改回「已有」。</text>
+
+    <rect x="650" y="452" width="600" height="76" rx="9" fill="#EDE6DA"/>
+    <text x="672" y="478" font-weight="700" fill="#3E3A3A" font-size="14">不确定就说不确定</text>
+    <text x="672" y="500" fill="#8C8585">方向卡会主动说明「这类岗位你最缺的是 X」，并标注匹配依据与</text>
+    <text x="672" y="518" fill="#8C8585">不确定项，不装作什么都懂。</text>
+
+    <rect x="650" y="542" width="600" height="76" rx="9" fill="#EDE6DA"/>
+    <text x="672" y="568" font-weight="700" fill="#3E3A3A" font-size="14">计划必须两周内做得完</text>
+    <text x="672" y="590" fill="#8C8585">按用户每周可投入时间分配预算，超出的部分明确告知被裁剪，</text>
+    <text x="672" y="608" fill="#8C8585">不偷偷塞满。每个任务带预期产出物与完成标准。</text>
+
+    <rect x="650" y="632" width="600" height="76" rx="9" fill="#EDE6DA"/>
+    <text x="672" y="658" font-weight="700" fill="#3E3A3A" font-size="14">任务要能写进简历</text>
+    <text x="672" y="680" fill="#8C8585">不生成「翻资料回忆你做过什么」这类无产出的元任务，</text>
+    <text x="672" y="698" fill="#8C8585">而是「写一份功能清单」「做一次真实迭代」这类能落地的动作。</text>
+  </g>
+
+  <!-- 底部质量数据 -->
+  <rect x="650" y="732" width="600" height="326" rx="12" fill="#EDE6DA" stroke="#D5C9B6"/>
+  <text x="950" y="764" text-anchor="middle" font-size="16" font-weight="700" fill="#3E3A3A">这条链路的实测数据</text>
+  <text x="950" y="786" text-anchor="middle" font-size="12" fill="#8C8585">5 个不同专业被测者 · 真实调模型 · 端到端走查</text>
+
+  <g>
+    <rect x="676" y="806" width="270" height="96" rx="9" fill="#FCF9F4"/>
+    <text x="811" y="834" text-anchor="middle" font-size="12" fill="#8C8585">待提升结论</text>
+    <text x="811" y="872" text-anchor="middle" font-size="30" font-weight="700" fill="#B08585">0 → 12</text>
+    <text x="811" y="892" text-anchor="middle" font-size="11" fill="#8C8585">修复 D1 后三分类不再退化</text>
+
+    <rect x="960" y="806" width="270" height="96" rx="9" fill="#FCF9F4"/>
+    <text x="1095" y="834" text-anchor="middle" font-size="12" fill="#8C8585">假阳性判定</text>
+    <text x="1095" y="872" text-anchor="middle" font-size="30" font-weight="700" fill="#B08585">2 → 0</text>
+    <text x="1095" y="892" text-anchor="middle" font-size="11" fill="#8C8585">修复 D2 后零处残留</text>
+
+    <rect x="676" y="914" width="270" height="96" rx="9" fill="#FCF9F4"/>
+    <text x="811" y="942" text-anchor="middle" font-size="12" fill="#8C8585">缺陷命中次数</text>
+    <text x="811" y="980" text-anchor="middle" font-size="30" font-weight="700" fill="#B08585">15 → 4</text>
+    <text x="811" y="1000" text-anchor="middle" font-size="11" fill="#8C8585">7 类缺陷中 5 类彻底消除</text>
+
+    <rect x="960" y="914" width="270" height="96" rx="9" fill="#FCF9F4"/>
+    <text x="1095" y="942" text-anchor="middle" font-size="12" fill="#8C8585">自动化测试</text>
+    <text x="1095" y="980" text-anchor="middle" font-size="30" font-weight="700" fill="#B08585">374 项</text>
+    <text x="1095" y="1000" text-anchor="middle" font-size="11" fill="#8C8585">149 单测 + 225 产品测试，全通过</text>
+  </g>
+
+  <text x="700" y="1150" text-anchor="middle" font-size="12" fill="#A9A29C">知涯 ZHIYA · 面向大学生的 AI 职业探索与求职成长伙伴</text>
+</svg>
