@@ -1,0 +1,26 @@
+{
+  "name": "zhiya-mvp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node test/run-all.js",
+    "test:unit": "node test/validate.test.js && node test/sanitize.test.js && node test/plan-alloc.test.js && node test/retry.test.js",
+    "test:report": "node test/report.js && node test/report-html.js",
+    "test:e2e": "node test/e2e.js",
+    "test:browser": "node test/browser.test.mjs && node test/browser-e2e.mjs",
+    "build": "node build/single-file.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tencent-ai/workbuddy-cloud-sdk": "^0.1.4",
+    "express": "^5.3.0"
+  },
+  "type": "module",
+  "devDependencies": {
+    "playwright": "^1.64.1"
+  }
+}
