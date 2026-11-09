@@ -46,7 +46,7 @@
 
 ### 方式一：离线单文件版（不需要服务器、不需要网络）
 
-下载仓库后双击 `知涯最终版.html`（由 `build/single-file.js` 生成），
+下载仓库后双击 `demo-offline.html`（已随仓库提供，快照已内联），
 或自行构建：
 
 ```bash
@@ -199,7 +199,7 @@ bash start.sh
 # 3. 首页点「用预置结果演示」→ 零延迟走完完整流程（85ms）
 ```
 
-**桌面单文件版**：`C:\Users\33629\Desktop\知涯最终版.html` —— 双击即开，不需要服务器，断网也能走完流程。
+**离线单文件版**：仓库根目录 `demo-offline.html` —— 双击即开，不需要服务器，断网也能走完流程。
 
 重新构建：`node build/single-file.js`
 
@@ -273,7 +273,8 @@ node test/single-file-offline.test.mjs  # 单文件版：断网离线（14 项�
 
 ## 桌面单文件版
 
-`build/single-file.js` 把 index.html + style.css + app.js + demo/snapshot.json 合成一个自包含 HTML，输出到桌面 `知涯最终版.html`。
+`build/single-file.js` 把 index.html + style.css + app.js + demo/snapshot.json 合成一个自包含 HTML，
+仓库内已提供构建产物 `demo-offline.html`（74KB，快照内联，断网可跑）。
 
 特点：
 - **双击即开**，不需要服务器
