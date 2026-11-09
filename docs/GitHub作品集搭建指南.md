@@ -245,7 +245,42 @@ for p in re.split(r'(?=<div class=\"screen)', s):
 静态托管对中文文件名的 URL 编码处理不一致。
 **所有要上传的文件一律用英文名**，包括 docx 和图片。
 
-### 坑 5：`doc_replace_text` 坐标会漂移
+### 坑 5：REST API 推送时中文路径会被 git 转义
+
+网络不稳时（`git push` 走 git 协议返回 502，但 `api.github.com` 可通），
+可以改用 REST API 推送 commit。但**必须关掉 git 的路径转义**：
+
+```bash
+# ❌ 错误：中文路径输出成 "docs/\344\275\xxx.md"（带引号 + 八进制转义）
+git ls-tree -r HEAD
+
+# ✅ 正确：拿到原始中文路径
+git -c core.quotePath=false ls-tree -r HEAD
+```
+
+不关的话，远程会生成**文件名里含引号和反斜杠**的错误路径 ——
+文件确实存在，但 GitHub 页面上的链接点不开，且 `contents` API 按正常路径查会返回 404。
+
+**排查方法**：用 tree API 拉远程文件列表，看路径里有没有 `"` 和 `\`：
+
+```bash
+curl -s -H "Authorization: Bearer $TOKEN" \
+  "https://api.github.com/repos/OWNER/REPO/git/trees/main?recursive=1" \
+  | python3 -c "
+import json,sys
+files=[x['path'] for x in json.load(sys.stdin)['tree'] if x['type']=='blob']
+bad=[f for f in files if '"' in f or '\\' in f]
+print('异常路径:', bad or '无')
+"
+```
+
+**修复方式**：用正确路径重建整棵 tree，生成一个新 commit 推进分支指针。
+
+**附带提醒**：用 API 重建 commit 会产生**与本地不同的 sha**，
+之后本地 `git push` 会被拒（`fetch + reset --hard origin/main` 对齐即可）。
+推完务必做一次 `git clone` 终检，不能只看 API 返回。
+
+### 坑 6：`doc_replace_text` 坐标会漂移
 
 用 editor_sdk 编辑 Word 时，`begin`/`end` 是 UTF-16 坐标，
 **替换后坐标会漂移**。多次替换要**从大到小**做，或每次重新 `doc_find` 定位。
