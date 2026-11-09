@@ -5,12 +5,40 @@
  */
 import express from 'express';
 import crypto from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { initCloud, retryState } from './cloud.js';
 import { normalizeTextInput, normalizeWeeklyHours } from './sanitize.js';
 import {
   runPipeline, runDirections, deriveScope, diffResults, STEPS,
 } from './pipeline.js';
+
+/* ---------- .env 加载（零依赖） ----------
+ * 云服务密钥不写进代码，也不提交到仓库。
+ * 部署沙箱里通常以环境变量注入，本地则读 .env.local / .env。
+ * 已存在的环境变量优先，不被文件覆盖。
+ */
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(__dirname, '..');
+for (const envFile of ['.env.local', '.env']) {
+  const p = join(ROOT, envFile);
+  if (!existsSync(p)) continue;
+  try {
+    for (const line of readFileSync(p, 'utf-8').split(/\r?\n/)) {
+      const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+      if (!m) continue;
+      const key = m[1];
+      let val = m[2].trim();
+      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+        val = val.slice(1, -1);
+      }
+      if (!(key in process.env)) process.env[key] = val;
+    }
+  } catch (e) {
+    console.warn(`[env] 读取 ${envFile} 失败：${e.message}`);
+  }
+}
 
 const app = express();
 app.use(express.json({ limit: '256kb' }));
@@ -34,12 +62,32 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: code, message, detail: String(err?.message || err) });
 });
 
-/* ---------- CORS：允许从任意本地端口访问（开发期预览面板会换端口） ---------- */
+/* ---------- CORS ----------
+ * 开发期：允许任意本地端口（WorkBuddy 预览面板端口会变）
+ * 线上：只放行白名单域名 —— 用户经历会上传到云服务，
+ *       任意来源都能调用等于把数据暴露给第三方站点。
+ * 白名单由 ALLOWED_ORIGINS 逗号分隔配置；未配置时线上不放行任何跨域。
+ */
+const DEV_ORIGIN = /^(https?:\/\/)?(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
+const ALLOWED_ORIGINS = new Set(
+  String(process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+);
+
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Vary', 'Origin');
+    const isDev = DEV_ORIGIN.test(origin) || origin === 'null';
+    const allowed = isDev || ALLOWED_ORIGINS.has(origin);
+    if (allowed) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    } else if (req.method === 'OPTIONS') {
+      // 不在白名单的来源，预检直接拒绝，不进入业务逻辑
+      return res.sendStatus(403);
+    }
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
