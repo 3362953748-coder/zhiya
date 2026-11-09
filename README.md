@@ -111,6 +111,7 @@ bash start.sh                 # Windows Git Bash / macOS / Linux
 | [`docs/可用性测试报告_V2.0.md`](docs/可用性测试报告_V2.0.md) | 同上，纯文本版，便于直接阅读与检索 |
 | [`docs/修复闭环说明.md`](docs/修复闭环说明.md) | 一页版修复闭环说明：根因、改法、验证数据 |
 | [`docs/v1-v2-对比数据.json`](docs/v1-v2-对比数据.json) | 修复前后的原始指标对比（可自行复核） |
+| [`docs/GitHub作品集搭建指南.md`](docs/GitHub作品集搭建指南.md) | 本次开源实践沉淀的方法论：密钥审计、提交历史组织、死链检查、5 个真实坑位 |
 
 > 其余四份产品文档（用户调研 / 竞品分析 / 产品决策书 / 定位文档 / PRD）
 > 收录在[在线作品集主页](https://zhiya-career.app.workbuddy.host/?sharecode=WVJRC4JK5Y)的文档索引中，
