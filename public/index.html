@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>知涯 ZHIYA · MVP 可点击演示</title>
+<!-- 资源带版本号：改了 app.js / style.css 后浏览器必定拉到新版，不会用缓存里的旧文件 -->
+<link rel="stylesheet" href="style.css?v=20261031-2">
+</head>
+<body>
+
+<div class="topbar"><b id="sbName">知涯 ZHIYA</b><span id="sbHint">可点击演示 · 点下方数字切换屏幕</span></div>
+
+<div class="phone" id="phone">
+
+<!-- 01 首页 -->
+<div class="screen on" id="s1">
+  <div class="scroll"><div class="pad">
+    <div style="font-size:13px;color:var(--t3);letter-spacing:1.2px;margin-top:40px">知涯 ZHIYA</div>
+    <div class="hero">知己所长，<br>行向天涯。</div>
+    <div class="sub">面向大学生的 AI 职业探索与求职成长伙伴</div>
+    <div class="pinkbox">AI 不替你决定人生，只帮助你看见更多可能。</div>
+    <div style="margin-top:40px"><button type="button" class="btn" data-go="s2">开始探索我的方向</button></div>
+    <div class="conn" id="connHint">正在连接知涯后端…</div>
+    <div class="demoTools">
+      <button class="demoBtn" id="btnDemoToggle">用预置结果演示</button>
+      <button class="demoBtn ghost" id="btnDemoFill">填入示例内容</button>
+    </div>
+    <div class="demoNote" id="demoNote" style="display:none">
+      演示模式已开启 · 跳过模型调用，直接展示预置结果（真实模型产出）
+    </div>
+    <div class="vals">
+      <div class="val"><b>看懂自己</b><span>从经历出发</span></div>
+      <div class="val"><b>对照岗位</b><span>对照岗位要求</span></div>
+      <div class="val"><b>落到行动</b><span>两周可执行</span></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 02 背景录入 -->
+<div class="screen" id="s2">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s1">‹</span>背景录入</div><div class="nav-r" data-go="s4">跳过</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="guide">先从一件事开始</div>
+    <div class="guide2">说说你在大学里做过什么 —— 越具体的一件，越好</div>
+    <textarea class="ta" id="rawText" placeholder="大三上学期，我参与过一个校园二手交易平台的课程项目，我负责后端接口和数据库设计……"></textarea>
+    <div class="jdf"><span id="rawCount">0 字</span><span>至少 10 字</span></div>
+    <div class="hint">一行一件具体的事。有数字、有角色、有结果最好。</div>
+    <div class="expand" data-toggle="ask">展开追问</div>
+    <div class="askbox" id="ask">
+      <div id="askList"></div>
+      <div class="asksrc" id="askSrc" style="display:none"></div>
+    </div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn dis" id="btnParse" data-go="s4" disabled>继续</button></div>
+</div>
+
+<!-- 03 追问弹窗 -->
+<div class="screen" id="s3">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s2">‹</span>追问</div><div class="nav-r" data-go="s2">关闭</div></div>
+  <div class="scroll"><div class="pad" style="padding-top:40px">
+    <div class="modal" style="margin:0 auto">
+      <div style="font-size:16px;font-weight:500;color:var(--t1);margin-bottom:20px">知涯想再确认两件事</div>
+      <div id="modalQs"></div>
+      <div class="mrow">
+        <div class="btn2" style="flex:1" data-go="s2">稍后再说</div>
+        <button type="button" class="btn3" style="flex:1" id="btnSubmitAsk">提交并继续</button>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 04 岗位方向 / JD 解析 -->
+<div class="screen" id="s4">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s2">‹</span>岗位方向</div><div class="nav-r" id="navRegen">重新解析</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="ctx" style="margin-bottom:0;height:auto;padding:12px 14px;align-items:flex-start;flex-direction:column;gap:6px">
+      <div style="font-size:12px;color:var(--t2);line-height:1.6" id="ctxText">填入目标岗位 JD，知涯会拆解岗位要求，再结合你的经历给出可探索方向。</div>
+    </div>
+
+    <div class="jdbox">
+      <div class="jdhd">
+        <span class="jdt">目标岗位 JD</span>
+        <span class="jda" id="jdSample">贴一段示例</span>
+      </div>
+      <textarea class="jdta" id="jdText" placeholder="把招聘网站上的岗位描述整段粘进来，越完整越好。&#10;&#10;例如：&#10;AI 产品经理实习生（校园招聘）&#10;岗位职责：…&#10;任职要求：…"></textarea>
+      <div class="jdf"><span id="jdCount">0 字</span><span>≥ 20 字可解析</span></div>
+    </div>
+
+    <div class="sec" id="jdSec" style="display:none"><span class="sec-t">这个岗位要什么能力</span><span class="sec-n" id="jdCount2"></span></div>
+    <div id="jdList"></div>
+
+    <div class="sec"><span class="sec-t">推荐方向</span><span class="sec-n" id="dirCount">—</span></div>
+    <div id="dirList"></div>
+
+    <div style="margin-top:18px"><div class="btn2" id="btnAnother">换一个方向</div></div>
+  </div></div>
+  <div class="foot">
+    <div class="fnote" id="footNote">粘贴 JD 后开始解析</div>
+    <button type="button" class="btn dis" id="btnToGap" disabled>继续</button>
+  </div>
+</div>
+
+<!-- 05 能力差距分析 -->
+<div class="screen" id="s5">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s4">‹</span>能力差距分析</div><div class="nav-r" data-go="s4">换岗位</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="ctx">
+      <span class="ctx-k">目标岗位</span><span class="ctx-v" id="gapRole">—</span><span class="ctx-tag" id="gapFamily">—</span>
+    </div>
+    <div class="sec"><span class="sec-t">岗位要求逐条对照</span><span class="sec-n" id="gapCount">—</span></div>
+    <div id="gapList"></div>
+    <div class="honest" style="margin-top:18px"><b>「信息不足」不等于「不具备」。</b><br>知涯只依据你已提供的信息作判断，不会替你推断能力边界。</div>
+  </div></div>
+  <div class="foot"><div class="fnote" id="gapNote">—</div><button type="button" class="btn" id="btnToPlan">继续生成行动计划</button></div>
+</div>
+
+<!-- 06 两周行动计划 -->
+<div class="screen" id="s6">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s5">‹</span>两周行动计划</div><div class="nav-r" data-go="s7">调整</div></div>
+  <div class="scroll"><div class="pad">
+    <div style="font-size:20px;font-weight:500;color:var(--t1);margin-top:16px">你的两周行动计划</div>
+    <div style="font-size:13px;color:var(--t3);margin-top:12px" id="planSummary">—</div>
+    <div id="planList"></div>
+    <div id="planWarn"></div>
+    <div style="height:8px"></div>
+  </div></div>
+  <div class="foot">
+    <div class="fnote" id="planFoot">—</div>
+    <div style="display:flex;gap:16px">
+      <div class="btn2" style="flex:1" data-go="s7">调整计划</div>
+      <button type="button" class="btn3" style="flex:1" id="btnPlanDone">确认并开始</button>
+    </div>
+  </div>
+</div>
+
+<!-- 07 确认调整 -->
+<div class="screen" id="s7">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s6">‹</span>确认行动</div><div class="nav-r" id="navRegen2">重新生成</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="card" style="margin-top:16px">
+      <div style="font-size:15px;font-weight:500;color:var(--t1);margin-bottom:8px" id="sumTitle">—</div>
+      <div style="font-size:13px;color:var(--t2)" id="sumSub">—</div>
+      <div class="bar"><div class="barf" id="sumBar"></div></div>
+    </div>
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 0 4px">
+      <div style="font-size:13px;color:var(--t2)">每周可投入时间</div>
+      <div style="font-size:13px;color:var(--blue)" id="hoursVal">10 小时/周</div>
+    </div>
+    <input type="range" id="hours" min="2" max="30" value="10" aria-label="每周可投入时间（小时）" aria-describedby="hoursHint">
+    <div style="font-size:11px;color:var(--t3);margin-top:12px" id="hoursHint">时间较多，可再增加任务</div>
+
+    <div class="sec"><span class="sec-t">任务清单</span><span class="sec-n">可勾选调整</span></div>
+    <div id="taskList"></div>
+    <div style="font-size:11px;color:var(--t4);margin-top:14px">取消勾选的任务会移出本次计划</div>
+  </div></div>
+  <div class="foot"><div class="fnote">时间投入会同步调整任务数量</div><button type="button" class="btn" id="btnStart">确认并开始执行</button></div>
+</div>
+
+<!-- 08 加载 / 差异对比 -->
+<div class="screen" id="s8">
+  <div class="nav"><div class="nav-t"><span class="back" id="back8">‹</span>知涯 AI</div><div class="nav-r" id="nav8r"></div></div>
+  <div class="scroll"><div class="pad">
+    <div id="s8body"></div>
+  </div></div>
+  <div class="foot" id="s8foot"></div>
+</div>
+
+</div>
+
+<div class="dots" id="dots"></div>
+<div class="hintbar">主链路可点通 · 04 → 05 → 06 → 07 均接真实 AI 接口</div>
+
+<script src="app.js?v=20261031-2"></script>
+</body>
+</html>
