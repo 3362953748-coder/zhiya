@@ -13,6 +13,9 @@ import { normalizeTextInput, normalizeWeeklyHours } from './sanitize.js';
 import {
   runPipeline, runDirections, deriveScope, diffResults, STEPS,
 } from './pipeline.js';
+import {
+  track, trackResult, trackFeedback, summarize, FUNNEL_STEPS,
+} from './telemetry.js';
 
 /* ---------- .env 加载（零依赖） ----------
  * 云服务密钥不写进代码，也不提交到仓库。
@@ -243,6 +246,21 @@ app.post('/api/analysis', async (req, res) => {
 
     const resultId = saveResult(state);
 
+    // 内测数据采集：只记匿名编号与结构化摘要，不记任何身份信息
+    const participant = String(body.participant || '').trim();
+    if (participant) {
+      trackResult({
+        participant,
+        track: body.track,
+        result: publicState(state),
+        perf: {
+          elapsed_ms: Date.now() - started,
+          model: state.model || 'auto',
+          weekly_hours: state.weekly_hours,
+        },
+      });
+    }
+
     res.json({
       result_id: resultId,
       ...publicState(state),
@@ -354,7 +372,57 @@ app.post('/api/analysis/regenerate', async (req, res) => {
   }
 });
 
-/* ---------- 辅助接口 ---------- */
+/* ---------- 内测数据采集接口 ---------- */
+
+/**
+ * POST /api/telemetry
+ * 前端在每个关键节点上报一次，用于计算漏斗转化率。
+ * body: { participant, step, track, meta }
+ */
+app.post('/api/telemetry', (req, res) => {
+  const body = req.body || {};
+  const participant = String(body.participant || '').trim();
+  const step = String(body.step || '').trim();
+  if (!participant || !step) {
+    return res.status(400).json({ error: 'bad_request', message: 'participant 与 step 必填' });
+  }
+  const ok = track({
+    participant,
+    step,
+    track: body.track,
+    meta: body.meta,
+  });
+  res.json({ ok });
+});
+
+/**
+ * POST /api/feedback
+ * 参与者填完问卷后提交主观反馈。
+ * body: { participant, track, feedback: { ... } }
+ */
+app.post('/api/feedback', (req, res) => {
+  const body = req.body || {};
+  const participant = String(body.participant || '').trim();
+  if (!participant) {
+    return res.status(400).json({ error: 'bad_request', message: 'participant 必填' });
+  }
+  const ok = trackFeedback({
+    participant,
+    track: body.track,
+    feedback: body.feedback || {},
+  });
+  res.json({ ok });
+});
+
+/**
+ * GET /api/summary
+ * 汇总内测数据。真实用户数据全部来自参与者实际使用。
+ */
+app.get('/api/summary', (req, res) => {
+  res.json(summarize());
+});
+
+/** 辅助接口 ---------- */
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, store_size: store.size, model: process.env.ZHIYA_MODEL || 'deepseek-v4.1-flash' });
 });

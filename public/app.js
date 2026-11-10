@@ -124,14 +124,40 @@ const state = {
   excludedTasks: new Set(),
   askShown: false,
   demoMode: false,     // 演示模式：跳过模型调用，用预置快照
+  /* 内测采集 */
+  participant: '',     // 匿名编号，如 cq-07
+  track: '',           // 求职方向：test/dev/pm/backend/other
+  fb: {},              // 问卷答案
 };
 
 const $ = (id) => document.getElementById(id);
+
+/* ---------- 内测埋点 ----------
+ * 只上报匿名编号 + 节点名，不含任何身份信息。
+ * 上报失败绝不打扰用户（静默忽略）。
+ */
+function telemetry(step, meta) {
+  if (!state.participant) return;
+  try {
+    fetch(`${apiUrl('/api/telemetry')}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        participant: state.participant,
+        step,
+        track: state.track,
+        meta: meta || {},
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch (_) { /* 埋点失败不影响主流程 */ }
+}
 
 /* ---------- 屏幕切换 ---------- */
 const NAMES = {
   s1: '01 首页', s2: '02 背景录入', s3: '03 追问', s4: '04 岗位方向',
   s5: '05 能力差距分析', s6: '06 两周行动计划', s7: '07 确认调整', s8: '08 AI 处理中',
+  s9: '09 使用反馈',
 };
 const dots = $('dots');
 Object.keys(NAMES).forEach((k) => {
@@ -149,7 +175,21 @@ function go(id) {
     d.classList.toggle('on', Object.keys(NAMES)[i] === id);
   });
   $('sbName').textContent = '知涯 ZHIYA · ' + NAMES[id];
+
+  // 漏斗埋点：进入该屏即视为到达该节点
+  const step = SCREEN_STEP[id];
+  if (step) telemetry(step);
 }
+
+/* ---------- 漏斗埋点：屏幕进入即算到达 ---------- */
+const SCREEN_STEP = {
+  s1: 'visit',
+  s2: 'input_start',
+  s4: 'jd_done',
+  s5: 'view_gap',
+  s6: 'view_plan',
+  s9: 'feedback',
+};
 
 /* ---------- 通用事件 ---------- */
 document.addEventListener('click', (e) => {
@@ -172,6 +212,7 @@ rawTa.addEventListener('input', () => {
 
 $('btnParse').onclick = () => {
   if (state.rawText.trim().length < 10) return;
+  telemetry('input_done');
   startAnalysis();
 };
 
@@ -206,10 +247,12 @@ $('jdText').addEventListener('input', onJdInput);
 /* ---------- 04 → 触发分析 ---------- */
 /* 04 页「继续」：还没分析过就发起分析；已分析过就直接进入 05 差距分析 */
 $('btnToGap').onclick = () => {
+  telemetry('jd_done');
   if (state.result && state.result.gap_report) {
     go('s5');
     return;
   }
+  telemetry('analysis_start');
   startAnalysis();
 };
 $('btnAnother').onclick = () => { startAnalysis({ keepDirection: false }); };
@@ -312,6 +355,9 @@ async function startAnalysis(opts = {}) {
         weekly_hours: state.weeklyHours,
         // 演示模式：直接返回预置快照，跳过模型调用
         demo: state.demoMode ? true : undefined,
+        // 内测采集：匿名编号与方向，用于算漏斗与效果指标
+        participant: state.participant || undefined,
+        track: state.track || undefined,
       }),
     });
     const { ok, data } = await parseResponse(res);
@@ -369,6 +415,39 @@ function applyResult(data, bannerText) {
       : `已解析 · ${secs} 秒`;
   if (bannerText) showDemoBanner(bannerText);
   else if (isDemo) showDemoBanner();
+
+  // 内测：分析完成节点上报（非演示模式才计，演示结果不是用户跑出来的）
+  if (!isDemo) telemetry('analysis_done', {
+    elapsed_ms: data.meta?.elapsed_ms || 0,
+    model: data.meta?.model || 'unknown',
+  });
+
+  // 加内测参与者时，结果页底部给一个「去反馈」入口
+  if (state.participant) addFeedbackEntry();
+}
+
+/**
+ * 在结果页（s6 行动计划）加入「去反馈」入口。
+ * 内测模式才显示 —— 没有参与者编号的用户不该被问反馈。
+ *
+ * 入口放在导航栏（固定可见，滚动到底也在那），而不是滚动区末尾：
+ * 滚动区内容长时末尾按钮在视口外，真人和自动化都点不到。
+ */
+function addFeedbackEntry() {
+  if ($('navFb')) {
+    $('navFb').style.display = '';
+    return;
+  }
+  const nav = $('s6').querySelector('.nav');
+  if (!nav) return;
+
+  const link = document.createElement('div');
+  link.className = 'nav-r fbNav';
+  link.id = 'navFb';
+  link.style.marginLeft = '14px';
+  link.textContent = '反馈';
+  link.onclick = () => go('s9');
+  nav.appendChild(link);
 }
 
 /**
@@ -736,6 +815,149 @@ $('btnDemoFill').onclick = () => {
   fillDemoInputs();
   go('s2');
 };
+
+/* ---------- 内测：参与者信息 ---------- */
+(function initBeta() {
+  const pidInput = $('betaPid');
+  const trackBox = $('betaTracks');
+  if (!pidInput || !trackBox) return;
+
+  // 编号存在 localStorage 里，同一个人换设备也能续上（只存匿名编号）
+  try {
+    const saved = localStorage.getItem('zhiya.beta.pid');
+    if (saved) {
+      pidInput.value = saved;
+      state.participant = saved;
+    }
+    const savedTrack = localStorage.getItem('zhiya.beta.track');
+    if (savedTrack) {
+      state.track = savedTrack;
+      trackBox.querySelectorAll('.betaTrack').forEach((b) => {
+        b.classList.toggle('on', b.getAttribute('data-track') === savedTrack);
+      });
+    }
+  } catch (_) { /* localStorage 不可用时忽略 */ }
+
+  pidInput.addEventListener('input', () => {
+    const v = pidInput.value.trim();
+    state.participant = v;
+    try {
+      if (v) localStorage.setItem('zhiya.beta.pid', v);
+      else localStorage.removeItem('zhiya.beta.pid');
+    } catch (_) { /* ignore */ }
+    // 填了编号才算进入漏斗（没填的用户不计入统计）
+    if (v) telemetry('visit', { track: state.track });
+  });
+
+  trackBox.querySelectorAll('.betaTrack').forEach((b) => {
+    b.onclick = () => {
+      const t = b.getAttribute('data-track');
+      state.track = state.track === t ? '' : t;
+      trackBox.querySelectorAll('.betaTrack').forEach((x) => {
+        x.classList.toggle('on', x.getAttribute('data-track') === state.track);
+      });
+      try {
+        if (state.track) localStorage.setItem('zhiya.beta.track', state.track);
+        else localStorage.removeItem('zhiya.beta.track');
+      } catch (_) { /* ignore */ }
+      telemetry('visit', { track: state.track });
+    };
+  });
+})();
+
+/* ---------- 内测：反馈问卷 ---------- */
+(function initFeedback() {
+  const rateBox = $('fbRate');
+  if (!rateBox) return;
+
+  rateBox.querySelectorAll('.fbR').forEach((b) => {
+    b.onclick = () => {
+      rateBox.querySelectorAll('.fbR').forEach((x) => x.classList.remove('on'));
+      b.classList.add('on');
+      state.fb.overall = Number(b.getAttribute('data-v'));
+      refreshFbBtn();
+    };
+  });
+
+  // 单选组
+  const effortBox = $('fbEffort');
+  effortBox.querySelectorAll('.fbC2').forEach((b) => {
+    b.onclick = () => {
+      effortBox.querySelectorAll('.fbC2').forEach((x) => x.classList.remove('on'));
+      b.classList.add('on');
+      state.fb.effort_minutes = Number(b.getAttribute('data-v'));
+      refreshFbBtn();
+    };
+  });
+
+  const recBox = $('fbRec');
+  recBox.querySelectorAll('.fbC2').forEach((b) => {
+    b.onclick = () => {
+      recBox.querySelectorAll('.fbC2').forEach((x) => x.classList.remove('on'));
+      b.classList.add('on');
+      state.fb.would_recommend = b.getAttribute('data-v');
+      refreshFbBtn();
+    };
+  });
+
+  // 多选组
+  const bindChecks = (boxId, key) => {
+    const box = $(boxId);
+    box.querySelectorAll('input[type=checkbox]').forEach((cb) => {
+      cb.onchange = () => {
+        state.fb[key] = [...box.querySelectorAll('input:checked')].map((x) => x.value);
+        refreshFbBtn();
+      };
+    });
+  };
+  bindChecks('fbUseful', 'useful_parts');
+  bindChecks('fbPain', 'pain_points');
+
+  $('fbQuote').addEventListener('input', (e) => {
+    state.fb.quote = e.target.value.trim();
+    refreshFbBtn();
+  });
+
+  function refreshFbBtn() {
+    const enough = state.fb.overall > 0;
+    $('btnFb').disabled = !enough;
+    $('btnFb').classList.toggle('dis', !enough);
+  }
+
+  $('btnFb').onclick = async () => {
+    const btn = $('btnFb');
+    btn.disabled = true;
+    btn.classList.add('dis');
+    btn.textContent = '提交中…';
+    try {
+      const res = await fetch(apiUrl('/api/feedback'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          participant: state.participant,
+          track: state.track,
+          feedback: state.fb,
+        }),
+      });
+      const { ok } = await parseResponse(res);
+      if (ok) {
+        telemetry('feedback');
+        btn.textContent = '已提交，谢谢你！';
+        setTimeout(() => { go('s6'); }, 900);
+      } else {
+        btn.textContent = '提交失败，重试';
+        btn.disabled = false;
+        btn.classList.remove('dis');
+      }
+    } catch (e) {
+      btn.textContent = '提交失败，重试';
+      btn.disabled = false;
+      btn.classList.remove('dis');
+    }
+  };
+
+  refreshFbBtn();
+})();
 
 /* ---------- 初始化 ---------- */
 onJdInput();

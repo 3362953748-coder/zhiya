@@ -263,6 +263,9 @@ export async function runDirections(state, model) {
       matched_evidence: Array.isArray(d?.matched_evidence) ? d.matched_evidence.map(String) : [],
     })).filter((d) => d.role);
   } catch (e) {
+    // 方向推荐是「锦上添花」，失败不该让整次分析崩掉。
+    // 但必须留下痕迹 —— 否则报告里「方向数 = 0」分不清是模型没给还是调用失败。
+    console.warn(`[directions] 生成失败，已降级为空：${e?.message}`);
     return [];
   }
 }

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>知涯 ZHIYA · MVP 可点击演示</title>
 <!-- 资源带版本号：改了 app.js / style.css 后浏览器必定拉到新版，不会用缓存里的旧文件 -->
-<link rel="stylesheet" href="style.css?v=20261031-2">
+<link rel="stylesheet" href="style.css?v=20261110-3">
 </head>
 <body>
 
@@ -28,6 +28,17 @@
     </div>
     <div class="demoNote" id="demoNote" style="display:none">
       演示模式已开启 · 跳过模型调用，直接展示预置结果（真实模型产出）
+    </div>
+    <div class="betaBox" id="betaBox">
+      <div class="betaTitle">内测参与信息<span class="betaOpt">可选填，不填则不计入统计</span></div>
+      <input class="betaInput" id="betaPid" placeholder="匿名编号，如 cq-07" maxlength="24" autocomplete="off">
+      <div class="betaTracks" id="betaTracks">
+        <button type="button" class="betaTrack" data-track="test">软件测试</button>
+        <button type="button" class="betaTrack" data-track="dev">软件开发</button>
+        <button type="button" class="betaTrack" data-track="pm">产品经理</button>
+        <button type="button" class="betaTrack" data-track="backend">后端开发</button>
+        <button type="button" class="betaTrack" data-track="other">其他</button>
+      </div>
     </div>
     <div class="vals">
       <div class="val"><b>看懂自己</b><span>从经历出发</span></div>
@@ -167,11 +178,69 @@
   <div class="foot" id="s8foot"></div>
 </div>
 
+<!-- 09 内测反馈问卷 -->
+<div class="screen" id="s9">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s6">‹</span>使用反馈</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="guide">用完了？给两句反馈</div>
+    <div class="guide2">内测版本，你的反馈会直接决定下一版改哪里</div>
+
+    <div class="fbQ">这次分析对你有帮助吗？</div>
+    <div class="fbRate" id="fbRate">
+      <button type="button" class="fbR" data-v="1">1</button>
+      <button type="button" class="fbR" data-v="2">2</button>
+      <button type="button" class="fbR" data-v="3">3</button>
+      <button type="button" class="fbR" data-v="4">4</button>
+      <button type="button" class="fbR" data-v="5">5</button>
+    </div>
+    <div class="fbScale"><span>完全没用</span><span>非常有用</span></div>
+
+    <div class="fbQ">哪一部分对你最有用？（可多选）</div>
+    <div class="fbChecks" id="fbUseful">
+      <label class="fbC"><input type="checkbox" value="岗位方向建议">岗位方向建议</label>
+      <label class="fbC"><input type="checkbox" value="能力差距判断">能力差距判断</label>
+      <label class="fbC"><input type="checkbox" value="行动计划">行动计划</label>
+      <label class="fbC"><input type="checkbox" value="经历追问">经历追问</label>
+      <label class="fbC"><input type="checkbox" value="证据与依据">证据与依据</label>
+      <label class="fbC"><input type="checkbox" value="都不太有用">都不太有用</label>
+    </div>
+
+    <div class="fbQ">哪里让你不满意？（可多选）</div>
+    <div class="fbChecks" id="fbPain">
+      <label class="fbC"><input type="checkbox" value="等待太久">等待太久</label>
+      <label class="fbC"><input type="checkbox" value="结果不准确">结果不准确</label>
+      <label class="fbC"><input type="checkbox" value="看不懂">看不懂</label>
+      <label class="fbC"><input type="checkbox" value="任务太大做不了">任务太大做不了</label>
+      <label class="fbC"><input type="checkbox" value="不符合我的目标岗位">不符合我的目标岗位</label>
+      <label class="fbC"><input type="checkbox" value="没有问题">没有问题</label>
+    </div>
+
+    <div class="fbQ">整个流程花了多久？</div>
+    <div class="fbChoices" id="fbEffort">
+      <button type="button" class="fbC2" data-v="3">3 分钟内</button>
+      <button type="button" class="fbC2" data-v="6">3-8 分钟</button>
+      <button type="button" class="fbC2" data-v="15">8-20 分钟</button>
+      <button type="button" class="fbC2" data-v="30">20 分钟以上</button>
+    </div>
+
+    <div class="fbQ">你会推荐给同学吗？</div>
+    <div class="fbChoices" id="fbRec">
+      <button type="button" class="fbC2" data-v="yes">会</button>
+      <button type="button" class="fbC2" data-v="maybe">看情况</button>
+      <button type="button" class="fbC2" data-v="no">不会</button>
+    </div>
+
+    <div class="fbQ">想对产品说一句话（选填）</div>
+    <textarea class="ta fbTa" id="fbQuote" placeholder="哪里好用、哪里别扭、你想用它做什么……"></textarea>
+  </div></div>
+  <div class="foot"><div class="fnote" id="fbNote">匿名提交，只记录你的编号与选项</div><button type="button" class="btn dis" id="btnFb" disabled>提交反馈</button></div>
+</div>
+
 </div>
 
 <div class="dots" id="dots"></div>
 <div class="hintbar">主链路可点通 · 04 → 05 → 06 → 07 均接真实 AI 接口</div>
 
-<script src="app.js?v=20261031-2"></script>
+<script src="app.js?v=20261110-3"></script>
 </body>
 </html>
