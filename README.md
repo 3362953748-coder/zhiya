@@ -68,7 +68,17 @@
 用户参与过课程项目的接口与数据库设计，但项目规模小、未体现需求分析与迭代优化的完整流程，
 所以判「沾边但不够」而非「已有」或「信息不足」。
 
-### 方式一：离线单文件版（不需要服务器、不需要网络）
+### 方式一：在线直连（推荐，无需安装任何东西）
+
+**https://zhiya-career-41390.app.workbuddy.host/?sharecode=ZIDF2K3Q6W**
+
+云端部署版本，前后端常驻，真实模型链路完整可用（单次分析约 20 秒）。
+打开链接即可体验完整 8 屏流程 —— 这是投递简历时最该发给面试官的入口。
+
+> 首次访问需在浏览器打开上面**完整链接**（含 `sharecode` 参数）。
+> 直接访问裸域名会返回「链接不完整」，这是分享链接的访问保护，不是服务故障。
+
+### 方式二：离线单文件版（不需要服务器、不需要网络）
 
 下载仓库后双击 `demo-offline.html`（已随仓库提供，快照已内联），
 或自行构建：
@@ -79,7 +89,7 @@ npm install && npm run build
 
 演示快照已内联，**完全断网也能走完 8 屏完整流程**。
 
-### 方式二：本地跑真实模型
+### 方式三：本地跑真实模型
 
 ```bash
 cp .env.example .env.local    # 填入 WB_CLOUD_PUBLISHABLE_KEY
@@ -149,9 +159,13 @@ bash start.sh                 # Windows Git Bash / macOS / Linux
 
 ## 一分钟跑起来
 
+**Windows（推荐）**：双击项目根目录的 `启动后端.bat`，或桌面上的「启动知涯后端」。
+脚本会自动定位项目目录、探活检测、崩溃自动重启，并在就绪后自动打开浏览器。
+
 ```bash
+# macOS / Linux / Git Bash
 cd zhiya-mvp
-bash start.sh          # Windows Git Bash / macOS / Linux
+bash start.sh
 ```
 
 打开 **http://127.0.0.1:5178** 即可。前端页面在 `public/`，接口在 `server/`。
@@ -160,6 +174,17 @@ bash start.sh          # Windows Git Bash / macOS / Linux
 > 预览面板是静态服务器，没有 `/api/analysis` 路由，页面会提示「连接到了错误的服务器」。
 > （新版前端已内置地址探测，从任何入口打开都会自动找到后端并在首页显示连接状态，
 > 但推荐仍用上面的地址，功能最完整。）
+
+**启动器命令**（`scripts/launch.mjs`）：
+
+| 命令 | 作用 |
+|---|---|
+| `node scripts/launch.mjs` | 启动后端并自动打开浏览器（已在跑则直接复用） |
+| `node scripts/launch.mjs --status` | 查看运行状态 |
+| `node scripts/launch.mjs --stop` | 停止守护进程 |
+| `node scripts/launch.mjs --no-open` | 启动但不打开浏览器 |
+
+日志写入 `logs/server.log`。后端进程崩溃会自动退避重启（最多 10 次）。
 
 **环境变量**（在 `.env.local` 里配置，该文件已被 `.gitignore` 排除，模板见 `.env.example`）：
 

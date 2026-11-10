@@ -374,7 +374,9 @@ app.get('/api/demo', (req, res) => {
 });
 
 // 静态资源：开发期禁缓存，避免改了前端还在跑旧代码
-app.use(express.static('public', {
+// 用绝对路径 —— 部署沙箱里进程 cwd 可能不是项目根目录，
+// 相对路径 'public' 会导致线上 404。
+app.use(express.static(join(ROOT, 'public'), {
   etag: false,
   lastModified: false,
   cacheControl: false,
@@ -384,7 +386,12 @@ app.use(express.static('public', {
 }));
 
 const PORT = Number(process.env.PORT) || 5178;
-app.listen(PORT, () => {
+// 部署在云沙箱里必须绑 0.0.0.0，只绑 127.0.0.1 会被反向代理拒掉。
+// 本地开发时 0.0.0.0 同样可用，不做区分。
+const HOST = process.env.HOST || '0.0.0.0';
+app.listen(PORT, HOST, () => {
   console.log(`知涯 MVP 后端已启动： http://127.0.0.1:${PORT}`);
   console.log(`模型：${process.env.ZHIYA_MODEL || 'deepseek-v4.1-flash'}`);
+  console.log(`监听：${HOST}:${PORT}`);
 });
+
