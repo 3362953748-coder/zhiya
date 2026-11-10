@@ -14,8 +14,12 @@
 </p>
 
 <p align="center">
-  <a href="https://zhiya-career.app.workbuddy.host/?sharecode=WVJRC4JK5Y">在线作品集主页 →</a>
-　·　<a href="docs/Usability-Test-Report-V2.0.docx">下载可用性测试报告（缺陷定位与修复前后对比）→</a>
+  <a href="https://zhiya-career-41390.app.workbuddy.host/?sharecode=ZIDF2K3Q6W"><b>🚀 在线体验（真实模型，云端常驻，约 20 秒出结果）→</b></a>
+ 　·　<a href="docs/Usability-Test-Report-V2.0.docx">下载可用性测试报告（缺陷定位与修复前后对比）→</a>
+</p>
+
+<p align="center">
+  <a href="#三分钟看到产品">三分钟看到产品 ↓</a>　·　<a href="#这个项目在证明什么">这个项目在证明什么 ↓</a>
 </p>
 
 ---
