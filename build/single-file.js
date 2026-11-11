@@ -85,6 +85,23 @@ out = out.replace(
   `<div class="buildfoot">知涯 ZHIYA 最终版 <b>v${VERSION}</b> · 构建于 ${BUILD_TIME} · 单文件离线可用</div>\n<div class="hintbar">`
 );
 
+/* ---------- 单文件版：连接状态提示改为「离线演示」 ----------
+   源文件 public/app.js 的 init() 在探测不到后端时统一报红：
+   「未连接到知涯后端 —— 请用 http://127.0.0.1:5178 打开本页，或先执行 bash start.sh」。
+   但单文件版本身就内置了快照、并不需要后端，探不到后端是正常状态。
+   原样发布会让访客（面试官）以为页面坏了，因此在构建期改写这一分支：
+   有内置快照 → 中性灰字提示离线演示；没有快照（服务端版）→ 保留原报错。
+   只改构建产物，不动 public/app.js 源码。 */
+out = out.replace(
+  /(\r?\n\s*)hint\.innerHTML = '<span style="color:var\(--err\)">●<\/span> 未连接到知涯后端 —— 请用 http:\/\/127\.0\.0\.1:5178 打开本页，或先执行 bash start\.sh';\r?\n(\s*)hint\.classList\.add\('bad'\);/,
+  `$1if (typeof BUILTIN_SNAPSHOT !== 'undefined' && BUILTIN_SNAPSHOT) {
+$1  hint.innerHTML = '<span style="color:var(--t3)">●</span> 离线演示模式 · 内置真实分析结果，无需启动后端';
+$1  hint.classList.remove('bad');
+$1} else {
+$1  hint.innerHTML = '<span style="color:var(--err)">●</span> 未连接到知涯后端 —— 请用 http://127.0.0.1:5178 打开本页，或先执行 bash start.sh';
+$1  hint.classList.add('bad');
+$1}`
+);
 const OUT_DIR = 'C:/Users/33629/Desktop';
 const OUT_FILE = resolve(OUT_DIR, '知涯最终版.html');
 mkdirSync(OUT_DIR, { recursive: true });
