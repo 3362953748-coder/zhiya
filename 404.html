@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>知涯 ZHIYA · 最终版 v1.0.0</title>
+<!-- 资源带版本号：改了 app.js / style.css 后浏览器必定拉到新版，不会用缓存里的旧文件 -->
+<style>
+:root{
+  --bg:#F2F0EC; --card:#FFFFFF; --blk:#FAF8F5; --line:#E8E4DE;
+  --blue:#4A6FA5; --blue2:#7A93BD; --bluebg:#E4EAF3; --bluebg2:#B8C6DC;
+  /* --blue3 用于浅蓝底上的文字（标签、徽章），保证对比度 ≥ 3:1 */
+  --blue3:#627BA6;
+  --pink:#C9A9AC; --pinkbg:#F2E4E4; --pinkfill:#E4C9CB;
+  --have:#E7EDE7; --have-t:#4A6152; --up:#F0E6D8; --up-t:#8A6A47;
+  --unk:#F2E4E4; --unk-t:#9A7376; --err:#C96B6B;
+  --t1:#2F3542; --t2:#5A6270; --t3:#767E8C; --t4:#7A8290;
+  /* --t5 仅用于纯装饰（删除线、对比块底色上的文字），不承担信息传达 */
+  --t5:#A8AEB9;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+/* button 语义化后的默认样式 reset —— 保持与原 div 版本视觉一致 */
+button{border:none;background:none;font-family:inherit;text-align:center;padding:0}
+button:focus-visible{outline:2px solid var(--blue2);outline-offset:2px}
+body{
+  background:#DFDBD5;font-family:"Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;padding:20px;
+}
+.topbar{width:393px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#8A857D}
+.topbar b{font-weight:500;color:#2F3542;font-size:13px;letter-spacing:.4px}
+.phone{width:393px;height:852px;background:var(--bg);border-radius:26px;overflow:hidden;position:relative;box-shadow:0 18px 50px rgba(0,0,0,.22)}
+.screen{position:absolute;inset:0;display:none;flex-direction:column}
+.screen.on{display:flex}
+
+/* 通用 */
+.nav{height:56px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.nav-t{font-size:16px;font-weight:500;color:var(--t1);letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
+.back{font-size:16px;color:var(--t1);cursor:pointer;user-select:none}
+.nav-r{font-size:12px;color:var(--t3);cursor:pointer;letter-spacing:.3px}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.pad{padding:16px 20px 0}
+.ctx{height:44px;background:var(--blk);border-radius:10px;display:flex;align-items:center;padding:0 14px;gap:10px}
+.ctx-k{font-size:11px;color:var(--t3);letter-spacing:.5px}
+.ctx-v{font-size:13px;font-weight:500;color:var(--t1)}
+.ctx-tag{margin-left:auto;font-size:11px;color:var(--blue3);background:var(--bluebg);padding:3px 8px;border-radius:4px}
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:22px 0 10px}
+.sec-t{font-size:12px;color:var(--t3);letter-spacing:.6px}
+.sec-n{font-size:11px;color:var(--t4)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px 15px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.03)}
+.card.gap{background:var(--pinkbg);border:1px dashed var(--pink);box-shadow:none}
+.hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.ct{font-size:15px;font-weight:500;color:var(--t1)}
+.tag{font-size:12px;padding:3px 10px;border-radius:5px;white-space:nowrap}
+.th{background:var(--have);color:var(--have-t)}
+.tu{background:var(--up);color:var(--up-t)}
+.tk{background:var(--unk);color:var(--unk-t);border:1px dashed var(--pink)}
+.l1{font-size:13px;color:var(--t2);line-height:1.7}
+.l2{font-size:13px;color:var(--t3);line-height:1.7}
+.l1p{font-size:13px;color:var(--unk-t);line-height:1.7}
+.btn{height:48px;background:var(--blue);border-radius:10px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;letter-spacing:.3px;cursor:pointer}
+.btn.dis{background:var(--line);color:var(--t4);cursor:not-allowed}
+.btn2{height:44px;background:#fff;border:1px solid var(--line);border-radius:10px;color:var(--t2);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+.btn3{height:44px;background:var(--blue);border-radius:10px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;cursor:pointer}
+.foot{padding:14px 20px 20px;flex-shrink:0;background:var(--bg)}
+.fnote{font-size:11px;color:var(--t4);text-align:center;margin-bottom:10px}
+.honest{background:var(--blk);border-radius:10px;border-left:3px solid var(--pink);padding:13px 14px;font-size:11px;color:var(--t3);line-height:1.8}
+.honest b{color:var(--unk-t);font-weight:500}
+
+/* 首页 */
+.hero{font-size:28px;font-weight:500;color:var(--t1);letter-spacing:-.5px;margin-top:56px}
+.sub{font-size:15px;color:var(--t2);margin-top:16px}
+.pinkbox{background:var(--pinkbg);border-radius:12px;padding:16px;font-size:13px;color:var(--unk-t);line-height:1.6;margin-top:32px;width:300px}
+.vals{display:flex;gap:11px;margin-top:64px}
+.val{flex:1;background:var(--blk);border-radius:10px;padding:16px 12px}
+.val b{display:block;font-size:14px;font-weight:500;color:var(--t1);margin-bottom:6px}
+.val span{font-size:11px;color:var(--t3)}
+
+/* 录入 */
+.guide{font-size:20px;font-weight:500;color:var(--t1);margin-top:16px}
+.guide2{font-size:14px;color:var(--t2);margin-top:12px}
+.ta{width:100%;height:180px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:16px;padding:16px;font-size:13px;line-height:1.7;color:var(--t1);font-family:inherit;resize:none}
+.ta::placeholder{color:var(--t4)}
+.ta:focus{outline:none;border-color:var(--blue2)}
+.hint{font-size:11px;color:var(--t3);margin-top:12px;letter-spacing:.3px}
+.expand{width:100px;height:36px;background:var(--pinkbg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--unk-t);margin-top:16px;cursor:pointer;user-select:none}
+.askbox{width:100%;border:1px dashed var(--pink);border-radius:10px;padding:16px;margin-top:16px;background:#fff;display:none}
+.askbox.on{display:block}
+.askq{font-size:14px;color:var(--t1);margin-bottom:8px}
+.aski{width:100%;height:38px;border:1px solid var(--line);border-radius:10px;margin-bottom:14px;padding:0 12px;font-size:13px;font-family:inherit;color:var(--t1)}
+.aski:focus{outline:none;border-color:var(--blue2)}
+.asksrc{font-size:11px;color:var(--t3);margin-top:6px}
+
+/* JD 输入 */
+.jdbox{background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:16px;overflow:hidden}
+.jdhd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line)}
+.jdt{font-size:13px;font-weight:500;color:var(--t1)}
+.jda{font-size:12px;color:var(--blue);cursor:pointer}
+.jdta{width:100%;height:150px;border:0;padding:14px;font-size:13px;line-height:1.7;font-family:inherit;color:var(--t1);resize:none}
+.jdta:focus{outline:none}
+.jdta::placeholder{color:var(--t4)}
+.jdf{background:var(--blk);padding:10px 14px;font-size:11px;color:var(--t3);display:flex;justify-content:space-between;align-items:center}
+
+/* 方向卡 */
+.dcard{position:relative;cursor:pointer}
+.dcard.sel::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--pink);border-radius:14px 0 0 14px}
+.dt{font-size:16px;font-weight:500;color:var(--t1);margin-bottom:10px}
+.tags{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.tg2{font-size:12px;padding:3px 10px;border-radius:5px}
+.tb1{background:var(--bluebg);color:var(--blue)}
+.evid{margin-top:10px;padding:9px 11px;background:var(--blk);border-radius:8px;font-size:12px;color:var(--t2);line-height:1.7}
+.evid .ei{display:block;font-size:10px;color:var(--t4);letter-spacing:.5px;margin-bottom:3px}
+
+/* 差距条目 */
+.gapcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px 15px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.03)}
+.gapcard.unknown{background:var(--pinkbg);border:1px dashed var(--pink);box-shadow:none}
+.gname{font-size:15px;font-weight:500;color:var(--t1);flex:1;padding-right:10px;line-height:1.4}
+.basis{margin-top:10px;padding:10px 12px;background:var(--blk);border-radius:8px;font-size:12px;color:var(--t2);line-height:1.7}
+.basis .bl{display:block;font-size:10px;color:var(--t4);letter-spacing:.5px;margin-bottom:4px}
+.gapcard.unknown .basis{background:#fff}
+.evidence{margin-top:9px;font-size:12px;color:var(--t2);line-height:1.7;padding-left:11px;border-left:2px solid var(--bluebg2)}
+.promptrow{margin-top:11px;padding-top:11px;border-top:1px dashed var(--pink)}
+.plabel{font-size:10px;color:var(--unk-t);letter-spacing:.5px;margin-bottom:5px}
+.ptext{font-size:13px;color:var(--unk-t);line-height:1.7}
+.addlink{margin-top:11px;height:34px;border:1px dashed var(--pink);border-radius:8px;background:transparent;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--unk-t);cursor:pointer;width:100%}
+.advice{margin-top:9px;font-size:13px;color:var(--t2);line-height:1.7}
+.advice .al{display:block;font-size:10px;color:var(--t4);letter-spacing:.5px;margin-bottom:4px}
+
+/* 任务卡 */
+.task{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(0,0,0,.03)}
+.taskh{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.pt{font-size:12px;padding:3px 10px;border-radius:5px;background:var(--up);color:var(--up-t)}
+.pt.p1{background:var(--blk);color:var(--t2)}
+.pt.p2{background:#F1EFE8;color:var(--t3)}
+.tt{font-size:15px;font-weight:500;color:var(--t1);line-height:1.4;flex:1}
+.tsub{font-size:13px;color:var(--t3);line-height:1.7;margin-bottom:10px}
+.hr{height:1px;background:#F1EFE8;margin:10px 0}
+.kv{display:flex;font-size:13px;line-height:1.9}
+.kv i{font-style:normal;color:var(--t3);font-size:12px;width:64px;flex-shrink:0}
+.kv b{font-weight:400;color:var(--t2)}
+.week{font-size:12px;color:var(--t3);letter-spacing:.6px;margin:22px 0 10px}
+.thrs{font-size:11px;color:var(--t4);margin-left:auto}
+
+/* 确认 */
+.kvrow{display:flex;align-items:center;gap:12px;height:32px;font-size:13px;color:var(--t1)}
+.box{width:20px;height:20px;border-radius:4px;background:var(--blue);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;cursor:pointer}
+.box.e{border:1px solid #D3D1C7;background:#fff}
+.track{height:4px;background:var(--line);border-radius:2px;position:relative;margin-top:14px}
+.fill{height:4px;width:40%;background:var(--blue);border-radius:2px;transition:width .25s}
+.knob{position:absolute;left:calc(40% - 10px);top:-8px;width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid var(--blue);transition:left .25s}
+.bar{height:6px;background:#F1EFE8;border-radius:3px;position:relative;margin-top:14px}
+.barf{height:6px;width:60%;background:var(--blue2);border-radius:3px}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--line);border-radius:2px;outline:none;margin-top:14px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid var(--blue);cursor:pointer}
+
+/* 弹窗 */
+.mask{position:absolute;inset:0;background:rgba(47,53,66,.6);display:none;align-items:center;justify-content:center;z-index:50}
+.mask.on{display:flex}
+.modal{width:353px;background:#fff;border-radius:16px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);max-height:760px;overflow-y:auto}
+.mi{width:100%;height:44px;border:1px solid var(--pink);border-radius:10px;margin-bottom:14px;padding:0 12px;font-size:13px;font-family:inherit;color:var(--t1)}
+.mi:focus{outline:none;border-color:var(--unk-t)}
+.mrow{display:flex;gap:15px;margin-top:8px}
+
+/* 加载 / 错误 / 差异 */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:70px 30px;text-align:center}
+.spin{width:32px;height:32px;border:2px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:18px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltext{font-size:14px;color:var(--t2);margin-bottom:6px}
+.lsub{font-size:11px;color:var(--t4);line-height:1.8}
+.steps{margin-top:22px;width:100%;text-align:left}
+.step{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--t4);padding:7px 0}
+.step .dot{width:6px;height:6px;border-radius:50%;background:var(--line);flex-shrink:0}
+.step.on{color:var(--t2)}
+.step.on .dot{background:var(--blue)}
+.step.done{color:var(--t3)}
+.step.done .dot{background:var(--have-t)}
+.errbox{background:#fff;border:1px solid var(--line);border-left:3px solid var(--err);border-radius:10px;padding:14px;margin-top:14px}
+.errbox .et{font-size:13px;color:var(--t1);font-weight:500;margin-bottom:6px}
+.errbox .em{font-size:12px;color:var(--t3);line-height:1.7;margin-bottom:12px}
+.cmdfix{background:var(--blk);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.cmdfix-l{font-size:10px;color:var(--t4);letter-spacing:.5px;margin-bottom:5px}
+.cmdfix code{display:block;font-family:Consolas,Monaco,monospace;font-size:12px;color:var(--t1);background:#fff;border:1px solid var(--line);border-radius:6px;padding:8px 10px;word-break:break-all;user-select:all}
+.ecode{font-size:10px;color:var(--t4);margin-bottom:10px;font-family:Consolas,monospace}
+.conn{font-size:11px;color:var(--t3);margin-top:14px;line-height:1.7;padding:8px 11px;background:var(--blk);border-radius:8px}
+.conn.bad{background:var(--pinkbg);color:var(--unk-t);border:1px dashed var(--pink)}
+.demoTools{display:flex;gap:10px;margin-top:12px}
+.demoBtn{flex:1;height:34px;background:#fff;border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--t2);cursor:pointer;font-family:inherit}
+.demoBtn:hover{border-color:var(--blue2);color:var(--blue)}
+.demoBtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.demoBtn.ghost{flex:0 0 auto;padding:0 14px}
+.demoNote{font-size:11px;color:var(--unk-t);background:var(--pinkbg);border:1px dashed var(--pink);border-radius:8px;padding:8px 11px;margin-top:10px;line-height:1.7}
+.demoBanner{font-size:11px;color:var(--unk-t);background:var(--pinkbg);border:1px dashed var(--pink);border-radius:8px;padding:7px 11px;margin-bottom:12px;line-height:1.6}
+.diffrow{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px;line-height:1.7}
+.diffrow:last-child{border-bottom:0}
+.dchip{font-size:10px;padding:2px 7px;border-radius:4px;flex-shrink:0;margin-top:1px}
+.dchg{background:var(--have);color:var(--have-t)}
+.dsame{background:#F1EFE8;color:var(--t5)}
+.dkey{flex:1;color:var(--t2)}
+.dkey b{display:block;color:var(--t1);font-weight:500;font-size:12px}
+.dside{font-size:11px;color:var(--t3);margin-top:3px}
+.dside s{text-decoration:line-through;color:var(--t5)}
+.darrow{color:var(--t3);font-size:11px}
+
+/* 屏幕切换条 */
+.dots{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;max-width:420px}
+.dot{width:30px;height:26px;border-radius:6px;background:rgba(255,255,255,.55);border:1px solid rgba(0,0,0,.08);font-size:10px;color:#6B6761;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:Consolas,monospace}
+.dot.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.hintbar{font-size:11px;color:#8A857D;text-align:center;max-width:420px;line-height:1.7}
+.badge{display:inline-block;font-size:11px;color:#0F6E56;background:#E1F5EE;padding:3px 10px;border-radius:5px;letter-spacing:.3px}
+
+/* ---------- 内测模式：参与信息 + 反馈问卷 ---------- */
+.betaBox{background:#FFFFFF;border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-top:18px}
+.betaTitle{font-size:12px;color:var(--t2);font-weight:500;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.betaOpt{font-size:10px;color:var(--t4);font-weight:400}
+.betaInput{width:100%;margin-top:9px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;
+           font-size:12.5px;color:var(--t1);background:var(--blk);font-family:inherit}
+.betaInput:focus{outline:none;border-color:var(--blue2);background:#fff}
+.betaTracks{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.betaTrack{font-size:11px;color:var(--t2);background:var(--bluebg);border:1px solid transparent;
+           padding:5px 11px;border-radius:14px;min-height:28px;transition:background .15s,color .15s}
+.betaTrack:hover{background:var(--bluebg2)}
+.betaTrack.on{background:var(--blue);color:#fff}
+
+.fbQ{font-size:12.5px;color:var(--t1);font-weight:500;margin-top:20px;margin-bottom:9px}
+.fbQ:first-of-type{margin-top:14px}
+.fbRate{display:flex;gap:7px}
+.fbR{flex:1;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--blk);
+     font-size:13px;color:var(--t2);display:flex;align-items:center;justify-content:center}
+.fbR:hover{border-color:var(--blue2)}
+.fbR.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.fbScale{display:flex;justify-content:space-between;font-size:10px;color:var(--t4);margin-top:5px}
+.fbChecks{display:flex;flex-direction:column;gap:7px}
+.fbC{font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px;cursor:pointer;
+     padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--blk);min-height:32px}
+.fbC:hover{border-color:var(--blue2)}
+.fbC input{width:15px;height:15px;accent-color:var(--blue);flex-shrink:0}
+.fbChoices{display:flex;flex-wrap:wrap;gap:7px}
+.fbC2{font-size:11.5px;color:var(--t2);background:var(--blk);border:1px solid var(--line);
+      padding:7px 13px;border-radius:14px;min-height:30px}
+.fbC2:hover{border-color:var(--blue2)}
+.fbC2.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.fbTa{min-height:88px}
+
+/* ---------- 进度提示（等待期可感知） ---------- */
+.loadnote{margin-top:16px;font-size:11.5px;color:var(--t3);line-height:1.7;text-align:left}
+
+</style>
+
+<style>
+.buildfoot{font-size:10px;color:var(--t4);text-align:center;padding:6px 0 10px;letter-spacing:.3px}
+.buildfoot b{font-weight:500;color:var(--t3)}
+</style>
+</head>
+<body>
+
+<div class="topbar"><b id="sbName">知涯 ZHIYA</b><span id="sbHint">可点击演示 · 点下方数字切换屏幕</span></div>
+
+<div class="phone" id="phone">
+
+<!-- 01 首页 -->
+<div class="screen on" id="s1">
+  <div class="scroll"><div class="pad">
+    <div style="font-size:13px;color:var(--t3);letter-spacing:1.2px;margin-top:40px">知涯 ZHIYA</div>
+    <div class="hero">知己所长，<br>行向天涯。</div>
+    <div class="sub">面向大学生的 AI 职业探索与求职成长伙伴</div>
+    <div class="pinkbox">AI 不替你决定人生，只帮助你看见更多可能。</div>
+    <div style="margin-top:40px"><button type="button" class="btn" data-go="s2">开始探索我的方向</button></div>
+    <div class="conn" id="connHint">正在连接知涯后端…</div>
+    <div class="demoTools">
+      <button class="demoBtn" id="btnDemoToggle">用预置结果演示</button>
+      <button class="demoBtn ghost" id="btnDemoFill">填入示例内容</button>
+    </div>
+    <div class="demoNote" id="demoNote" style="display:none">
+      演示模式已开启 · 跳过模型调用，直接展示预置结果（真实模型产出）
+    </div>
+    <div class="betaBox" id="betaBox">
+      <div class="betaTitle">内测参与信息<span class="betaOpt">可选填，不填则不计入统计</span></div>
+      <input class="betaInput" id="betaPid" placeholder="匿名编号，如 cq-07" maxlength="24" autocomplete="off">
+      <div class="betaTracks" id="betaTracks">
+        <button type="button" class="betaTrack" data-track="test">软件测试</button>
+        <button type="button" class="betaTrack" data-track="dev">软件开发</button>
+        <button type="button" class="betaTrack" data-track="pm">产品经理</button>
+        <button type="button" class="betaTrack" data-track="backend">后端开发</button>
+        <button type="button" class="betaTrack" data-track="other">其他</button>
+      </div>
+    </div>
+    <div class="vals">
+      <div class="val"><b>看懂自己</b><span>从经历出发</span></div>
+      <div class="val"><b>对照岗位</b><span>对照岗位要求</span></div>
+      <div class="val"><b>落到行动</b><span>两周可执行</span></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 02 背景录入 -->
+<div class="screen" id="s2">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s1">‹</span>背景录入</div><div class="nav-r" data-go="s4">跳过</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="guide">先从一件事开始</div>
+    <div class="guide2">说说你在大学里做过什么 —— 越具体的一件，越好</div>
+    <textarea class="ta" id="rawText" placeholder="大三上学期，我参与过一个校园二手交易平台的课程项目，我负责后端接口和数据库设计……"></textarea>
+    <div class="jdf"><span id="rawCount">0 字</span><span>至少 10 字</span></div>
+    <div class="hint">一行一件具体的事。有数字、有角色、有结果最好。</div>
+    <div class="expand" data-toggle="ask">展开追问</div>
+    <div class="askbox" id="ask">
+      <div id="askList"></div>
+      <div class="asksrc" id="askSrc" style="display:none"></div>
+    </div>
+  </div></div>
+  <div class="foot"><button type="button" class="btn dis" id="btnParse" data-go="s4" disabled>继续</button></div>
+</div>
+
+<!-- 03 追问弹窗 -->
+<div class="screen" id="s3">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s2">‹</span>追问</div><div class="nav-r" data-go="s2">关闭</div></div>
+  <div class="scroll"><div class="pad" style="padding-top:40px">
+    <div class="modal" style="margin:0 auto">
+      <div style="font-size:16px;font-weight:500;color:var(--t1);margin-bottom:20px">知涯想再确认两件事</div>
+      <div id="modalQs"></div>
+      <div class="mrow">
+        <div class="btn2" style="flex:1" data-go="s2">稍后再说</div>
+        <button type="button" class="btn3" style="flex:1" id="btnSubmitAsk">提交并继续</button>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- 04 岗位方向 / JD 解析 -->
+<div class="screen" id="s4">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s2">‹</span>岗位方向</div><div class="nav-r" id="navRegen">重新解析</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="ctx" style="margin-bottom:0;height:auto;padding:12px 14px;align-items:flex-start;flex-direction:column;gap:6px">
+      <div style="font-size:12px;color:var(--t2);line-height:1.6" id="ctxText">填入目标岗位 JD，知涯会拆解岗位要求，再结合你的经历给出可探索方向。</div>
+    </div>
+
+    <div class="jdbox">
+      <div class="jdhd">
+        <span class="jdt">目标岗位 JD</span>
+        <span class="jda" id="jdSample">贴一段示例</span>
+      </div>
+      <textarea class="jdta" id="jdText" placeholder="把招聘网站上的岗位描述整段粘进来，越完整越好。&#10;&#10;例如：&#10;AI 产品经理实习生（校园招聘）&#10;岗位职责：…&#10;任职要求：…"></textarea>
+      <div class="jdf"><span id="jdCount">0 字</span><span>≥ 20 字可解析</span></div>
+    </div>
+
+    <div class="sec" id="jdSec" style="display:none"><span class="sec-t">这个岗位要什么能力</span><span class="sec-n" id="jdCount2"></span></div>
+    <div id="jdList"></div>
+
+    <div class="sec"><span class="sec-t">推荐方向</span><span class="sec-n" id="dirCount">—</span></div>
+    <div id="dirList"></div>
+
+    <div style="margin-top:18px"><div class="btn2" id="btnAnother">换一个方向</div></div>
+  </div></div>
+  <div class="foot">
+    <div class="fnote" id="footNote">粘贴 JD 后开始解析</div>
+    <button type="button" class="btn dis" id="btnToGap" disabled>继续</button>
+  </div>
+</div>
+
+<!-- 05 能力差距分析 -->
+<div class="screen" id="s5">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s4">‹</span>能力差距分析</div><div class="nav-r" data-go="s4">换岗位</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="ctx">
+      <span class="ctx-k">目标岗位</span><span class="ctx-v" id="gapRole">—</span><span class="ctx-tag" id="gapFamily">—</span>
+    </div>
+    <div class="sec"><span class="sec-t">岗位要求逐条对照</span><span class="sec-n" id="gapCount">—</span></div>
+    <div id="gapList"></div>
+    <div class="honest" style="margin-top:18px"><b>「信息不足」不等于「不具备」。</b><br>知涯只依据你已提供的信息作判断，不会替你推断能力边界。</div>
+  </div></div>
+  <div class="foot"><div class="fnote" id="gapNote">—</div><button type="button" class="btn" id="btnToPlan">继续生成行动计划</button></div>
+</div>
+
+<!-- 06 两周行动计划 -->
+<div class="screen" id="s6">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s5">‹</span>两周行动计划</div><div class="nav-r" data-go="s7">调整</div></div>
+  <div class="scroll"><div class="pad">
+    <div style="font-size:20px;font-weight:500;color:var(--t1);margin-top:16px">你的两周行动计划</div>
+    <div style="font-size:13px;color:var(--t3);margin-top:12px" id="planSummary">—</div>
+    <div id="planList"></div>
+    <div id="planWarn"></div>
+    <div style="height:8px"></div>
+  </div></div>
+  <div class="foot">
+    <div class="fnote" id="planFoot">—</div>
+    <div style="display:flex;gap:16px">
+      <div class="btn2" style="flex:1" data-go="s7">调整计划</div>
+      <button type="button" class="btn3" style="flex:1" id="btnPlanDone">确认并开始</button>
+    </div>
+  </div>
+</div>
+
+<!-- 07 确认调整 -->
+<div class="screen" id="s7">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s6">‹</span>确认行动</div><div class="nav-r" id="navRegen2">重新生成</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="card" style="margin-top:16px">
+      <div style="font-size:15px;font-weight:500;color:var(--t1);margin-bottom:8px" id="sumTitle">—</div>
+      <div style="font-size:13px;color:var(--t2)" id="sumSub">—</div>
+      <div class="bar"><div class="barf" id="sumBar"></div></div>
+    </div>
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin:24px 0 4px">
+      <div style="font-size:13px;color:var(--t2)">每周可投入时间</div>
+      <div style="font-size:13px;color:var(--blue)" id="hoursVal">10 小时/周</div>
+    </div>
+    <input type="range" id="hours" min="2" max="30" value="10" aria-label="每周可投入时间（小时）" aria-describedby="hoursHint">
+    <div style="font-size:11px;color:var(--t3);margin-top:12px" id="hoursHint">时间较多，可再增加任务</div>
+
+    <div class="sec"><span class="sec-t">任务清单</span><span class="sec-n">可勾选调整</span></div>
+    <div id="taskList"></div>
+    <div style="font-size:11px;color:var(--t4);margin-top:14px">取消勾选的任务会移出本次计划</div>
+  </div></div>
+  <div class="foot"><div class="fnote">时间投入会同步调整任务数量</div><button type="button" class="btn" id="btnStart">确认并开始执行</button></div>
+</div>
+
+<!-- 08 加载 / 差异对比 -->
+<div class="screen" id="s8">
+  <div class="nav"><div class="nav-t"><span class="back" id="back8">‹</span>知涯 AI</div><div class="nav-r" id="nav8r"></div></div>
+  <div class="scroll"><div class="pad">
+    <div id="s8body"></div>
+  </div></div>
+  <div class="foot" id="s8foot"></div>
+</div>
+
+<!-- 09 内测反馈问卷 -->
+<div class="screen" id="s9">
+  <div class="nav"><div class="nav-t"><span class="back" data-go="s6">‹</span>使用反馈</div></div>
+  <div class="scroll"><div class="pad">
+    <div class="guide">用完了？给两句反馈</div>
+    <div class="guide2">内测版本，你的反馈会直接决定下一版改哪里</div>
+
+    <div class="fbQ">这次分析对你有帮助吗？</div>
+    <div class="fbRate" id="fbRate">
+      <button type="button" class="fbR" data-v="1">1</button>
+      <button type="button" class="fbR" data-v="2">2</button>
+      <button type="button" class="fbR" data-v="3">3</button>
+      <button type="button" class="fbR" data-v="4">4</button>
+      <button type="button" class="fbR" data-v="5">5</button>
+    </div>
+    <div class="fbScale"><span>完全没用</span><span>非常有用</span></div>
+
+    <div class="fbQ">哪一部分对你最有用？（可多选）</div>
+    <div class="fbChecks" id="fbUseful">
+      <label class="fbC"><input type="checkbox" value="岗位方向建议">岗位方向建议</label>
+      <label class="fbC"><input type="checkbox" value="能力差距判断">能力差距判断</label>
+      <label class="fbC"><input type="checkbox" value="行动计划">行动计划</label>
+      <label class="fbC"><input type="checkbox" value="经历追问">经历追问</label>
+      <label class="fbC"><input type="checkbox" value="证据与依据">证据与依据</label>
+      <label class="fbC"><input type="checkbox" value="都不太有用">都不太有用</label>
+    </div>
+
+    <div class="fbQ">哪里让你不满意？（可多选）</div>
+    <div class="fbChecks" id="fbPain">
+      <label class="fbC"><input type="checkbox" value="等待太久">等待太久</label>
+      <label class="fbC"><input type="checkbox" value="结果不准确">结果不准确</label>
+      <label class="fbC"><input type="checkbox" value="看不懂">看不懂</label>
+      <label class="fbC"><input type="checkbox" value="任务太大做不了">任务太大做不了</label>
+      <label class="fbC"><input type="checkbox" value="不符合我的目标岗位">不符合我的目标岗位</label>
+      <label class="fbC"><input type="checkbox" value="没有问题">没有问题</label>
+    </div>
+
+    <div class="fbQ">整个流程花了多久？</div>
+    <div class="fbChoices" id="fbEffort">
+      <button type="button" class="fbC2" data-v="3">3 分钟内</button>
+      <button type="button" class="fbC2" data-v="6">3-8 分钟</button>
+      <button type="button" class="fbC2" data-v="15">8-20 分钟</button>
+      <button type="button" class="fbC2" data-v="30">20 分钟以上</button>
+    </div>
+
+    <div class="fbQ">你会推荐给同学吗？</div>
+    <div class="fbChoices" id="fbRec">
+      <button type="button" class="fbC2" data-v="yes">会</button>
+      <button type="button" class="fbC2" data-v="maybe">看情况</button>
+      <button type="button" class="fbC2" data-v="no">不会</button>
+    </div>
+
+    <div class="fbQ">想对产品说一句话（选填）</div>
+    <textarea class="ta fbTa" id="fbQuote" placeholder="哪里好用、哪里别扭、你想用它做什么……"></textarea>
+  </div></div>
+  <div class="foot"><div class="fnote" id="fbNote">匿名提交，只记录你的编号与选项</div><button type="button" class="btn dis" id="btnFb" disabled>提交反馈</button></div>
+</div>
+
+</div>
+
+<div class="dots" id="dots"></div>
+<div class="buildfoot">知涯 ZHIYA 最终版 <b>v1.0.0</b> · 构建于 2026-11-11 05:06 · 单文件离线可用</div>
+<div class="hintbar">主链路可点通 · 04 → 05 → 06 → 07 均接真实 AI 接口</div>
+
+<script>
+
+/* ============================================================
+ * 单文件版内置数据 —— 完全断网也能演示
+ * 由 build/single-file.js 在构建时注入，勿手改
+ * ============================================================ */
+const BUILTIN_SNAPSHOT = {"result_id":"89149b49-02df-48f1-9c1a-d3f8b26a3377","profile":{"major":"计算机科学与技术","grade":"大三","skills":["Java","MySQL","动态规划"],"experiences":[{"title":"校园二手交易平台的课程项目","role":"负责后端接口和数据库设计","evidence":"上学期做了一个校园二手交易平台的课程项目，我负责后端接口和数据库设计，用 Java 写的，一共做了 8 个接口，数据库用 MySQL 建的表。team一共 5 个人，我负责接口那一块。","implied_ability":"后端接口开发与数据库设计"},{"title":"学校程序设计竞赛","role":"参赛者（获三等奖）","evidence":"我还参加过学校程序设计竞赛拿了个三等奖，题目是动态规划。","implied_ability":"算法与动态规划解题"},{"title":"LeetCode 刷题","role":"刷题练习","evidence":"平时喜欢刷 LeetCode，目前做完了 200 多道题。","implied_ability":"算法练习"}],"interests":["刷 LeetCode"],"missing_fields":[{"field":"求职意向方向","prompt":"你希望找哪一类岗位，比如后端开发、算法还是其他方向？"},{"field":"程序设计竞赛层级与时间","prompt":"这个程序设计竞赛是哪一年、校级还是更高级别举办的？"}]},"jd_profile":{"role_name":"后端开发实习生（Java 方向）","requirements":[{"item":"用户需求调研","ability_type":"需求调研","category":"duty","importance":"required","evidence":"完成需求分析和技术方案设计"},{"item":"功能设计与迭代","ability_type":"功能设计","category":"duty","importance":"required","evidence":"完成需求分析和技术方案设计"},{"item":"使用 Java / Spring Boot 编写业务代码，完成接口开发与数据库设计","ability_type":"","category":"must_skill","importance":"required","evidence":"使用 Java / Spring Boot 编写业务代码，完成接口开发与数据库设计"},{"item":"数据跟踪与迭代优化","ability_type":"数据分析","category":"duty","importance":"required","evidence":"参与系统性能优化与线上问题排查"},{"item":"编写单元测试与技术文档，配合测试完成验收","ability_type":"","category":"duty","importance":"required","evidence":"编写单元测试与技术文档，配合测试完成验收"},{"item":"本科及以上在读，计算机相关专业优先","ability_type":"","category":"major_req","importance":"required","evidence":"本科及以上在读，计算机相关专业优先"},{"item":"逻辑思考能力","ability_type":"逻辑思考","category":"must_skill","importance":"required","evidence":"有较强的逻辑思维能力和问题排查能力"},{"item":"Spring / Spring Boot 框架了解","ability_type":"","category":"plus_skill","importance":"plus","evidence":"了解 Spring / Spring Boot 等主流框架者优先"},{"item":"相关专业背景","ability_type":"专业背景","category":"major_req","importance":"plus","evidence":"1. 本科及以上在读，计算机相关专业优先"},{"item":"学历与年级门槛","ability_type":"学历门槛","category":"major_req","importance":"required","evidence":"1. 本科及以上在读，计算机相关专业优先"}],"ambiguous":[{"item":"熟练掌握 Java 基础，熟悉常用数据结构与算法","evidence":"熟练掌握 Java 基础，熟悉常用数据结构与算法"},{"item":"熟悉 MySQL 或 Redis 等常用数据库","evidence":"熟悉 MySQL 或 Redis 等常用数据库"}],"job_summary":"该岗位实习生参与公司核心业务系统后端开发，使用 Java / Spring Boot 编写代码、完成接口与数据库设计，并参与性能优化、问题排查及测试文档编写。"},"directions":[{"role":"后端开发实习生（Java 方向）","match_level":"匹配度较高","reason":"你上学期在校园二手交易平台课程项目中负责后端接口和数据库设计，用 Java 写了 8 个接口并用 MySQL 建表，这直接对应岗位要求的「使用 Java 编写业务代码，完成接口开发与数据库设计」；同时你是计算机科学与技术专业大三在读，符合「本科及以上在读，计算机相关专业优先」的学历与专业门槛。","uncertainty":"岗位要求中提及 Spring / Spring Boot 框架，但你的经历档案中没有提到你是否使用或了解该框架；此外岗位涉及需求调研、功能设计迭代、单元测试与技术文档、性能优化与线上问题排查，你的档案中也未提及这些环节的参与情况。","matched_evidence":["上学期做了一个校园二手交易平台的课程项目，我负责后端接口和数据库设计，用 Java 写的，一共做了 8 个接口，数据库用 MySQL 建的表。","计算机科学与技术","大三"]},{"role":"算法/数据结构方向实习生","match_level":"可尝试","reason":"你参加过学校程序设计竞赛并获得三等奖，题目是动态规划，平时还刷了 200 多道 LeetCode，这些经历对应岗位要求中「较强的逻辑思维能力和问题排查能力」以及「熟悉常用数据结构与算法」的模糊要求，说明你在算法解题上有持续练习和一定积累。","uncertainty":"你的经历档案中没有说明该竞赛是校级还是更高级别、具体是哪一年参加的，也没有提及你是否做过算法在实际业务系统中的落地应用；此外该方向与目标岗位的后端开发主线关联度需要你进一步确认求职意向。","matched_evidence":["我还参加过学校程序设计竞赛拿了个三等奖，题目是动态规划。","平时喜欢刷 LeetCode，目前做完了 200 多道题。"]}],"gap_report":{"items":[{"requirement":"用户需求调研","status":"unknown","evidence":"","basis":"经历档案中仅提到课程项目负责后端接口与数据库设计、竞赛刷题，未涉及任何需求分析或用户调研相关的线索，无法判断是否具备。","advice":"","prompt":"在校园二手交易平台项目里，你有没有参与过需求分析，比如梳理用户要哪些功能、写需求说明？","weight":3},{"requirement":"功能设计与迭代","status":"improve","evidence":"","basis":"用户参与了课程项目并负责接口与数据库设计，属于功能设计沾边的经历，但项目是课程作业、规模较小（8 个接口），未体现需求分析、技术方案设计及后续迭代优化的完整过程，与岗位「完成需求分析和技术方案设计」的要求有差距。","advice":"在现有项目中补一份技术方案设计文档：写明需求拆解、接口清单、表结构设计理由，并记录一次根据反馈调整接口或表结构的迭代过程。","prompt":"","weight":3},{"requirement":"使用 Java / Spring Boot 编写业务代码，完成接口开发与数据库设计","status":"have","evidence":"Java","basis":"你在经历里明确提到用过「Java」，对应岗位要求的这项工具能力","advice":"","prompt":"","weight":3},{"requirement":"数据跟踪与迭代优化","status":"unknown","evidence":"","basis":"经历档案中没有提到系统性能监控、日志、线上问题排查或数据跟踪优化的任何线索，无法判断是否具备。","advice":"","prompt":"你的项目上线或运行后，有没有看过接口耗时、日志或数据库慢查询，并据此做过优化？","weight":3},{"requirement":"本科及以上在读，计算机相关专业优先","status":"unknown","evidence":"","basis":"用户为计算机科学与技术专业大三在读，属于岗位要求的本科在读且计算机相关专业，专业大类完全对应。","advice":"","prompt":"你在「本科及以上在读，计算机相关专业优先」方面做过什么？哪怕只是课程作业里的一小部分。","weight":3},{"requirement":"学历与年级门槛","status":"have","evidence":"大三","basis":"用户原文明确提到「大三」，满足岗位的学历年级门槛","advice":"","prompt":"","weight":3},{"requirement":"编写单元测试与技术文档，配合测试完成验收","status":"unknown","evidence":"","basis":"经历档案中未提及单元测试、技术文档或与测试配合验收的经历，找不到相关线索。","advice":"","prompt":"课程项目里你有没有写过单元测试或接口测试用例，以及 README、接口文档这类技术文档？","weight":2},{"requirement":"逻辑思考能力","status":"have","evidence":"我还参加过学校程序设计竞赛拿了个三等奖，题目是动态规划。","basis":"用户参加程序设计竞赛并以动态规划题目获校级三等奖，且平时刷完 200 多道 LeetCode，能体现较强的逻辑思维与问题求解能力，可支撑该能力项。","advice":"","prompt":"","weight":2},{"requirement":"Spring / Spring Boot 框架了解","status":"unknown","evidence":"","basis":"经历档案中项目仅说明用 Java 编写接口，未提及是否使用 Spring 或 Spring Boot，也无法从其他经历推断，找不到相关线索。","advice":"","prompt":"你接触过 Spring 或 Spring Boot 吗？有没有用它们写过接口或做过小 demo？","weight":1},{"requirement":"相关专业背景","status":"have","evidence":"计算机","basis":"用户专业为「计算机」，与岗位要求的「1. 本科及以上在读，计算机相关专业优先」属同一专业大类","advice":"","prompt":"","weight":1}],"summary":{"total":10,"have":4,"improve":1,"unknown":5},"unmapped_items":["MySQL 数据库使用","Java 编程","动态规划算法解题"],"violations":[{"type":"hallucination","requirement":"本科及以上在读，计算机相关专业优先","detail":"证据「计算机科学与技术专业，大三」无法在经历档案中回指，已降级为 unknown"},{"type":"hallucination","requirement":"相关专业背景","detail":"证据「计算机科学与技术专业，大三」无法在经历档案中回指，已降级为 unknown"},{"type":"hallucination","requirement":"学历与年级门槛","detail":"证据「计算机科学与技术专业，大三」无法在经历档案中回指，已降级为 unknown"},{"type":"deterministic_education","requirement":"相关专业背景","detail":"结论改由原文判定为 have（原为 unknown）"},{"type":"deterministic_education","requirement":"学历与年级门槛","detail":"结论改由原文判定为 have（原为 unknown）"},{"type":"deterministic_tool_skill","requirement":"使用 Java / Spring Boot 编写业务代码，完成接口开发与数据库设计","detail":"结论改由原文判定为 have（原为 improve）"}]},"action_plan":{"tasks":[{"title":"把校园二手交易平台的需求写成 1 页功能清单，包含角色、场景和功能点","detail":"按买家、卖家两类角色列举核心场景，每条场景对应 3-5 个功能点，标注哪些是课程项目已实现、哪些是当初想做但没做的。","priority":"P0","week":1,"expected_output":"一份 1 页的需求功能清单（含角色、场景、功能点、实现状态四列）","completion_criteria":"清单覆盖至少 2 类角色、6 个场景、20 个功能点，且每个功能点都标注了实现状态","basis":"用户需求调研","estimated_hours":2},{"title":"为校园二手交易平台补写技术方案设计文档：需求拆解、接口清单与表结构设计理由","detail":"把现有的 8 个接口重新整理成接口清单（路径、方法、入参出参），并针对每张数据库表写明字段设计理由和索引考虑。","priority":"P0","week":1,"expected_output":"一份技术方案设计文档（含需求拆解、8 个接口清单、全部表结构与设计理由）","completion_criteria":"文档覆盖全部 8 个接口且每个接口都有入参出参说明，每张表每个字段都写了设计理由","basis":"功能设计与迭代","estimated_hours":4},{"title":"在二手交易平台里做一次真实迭代：根据 3 条模拟用户反馈调整 1 个接口和 1 张表结构","detail":"先写 3 条用户反馈（如「搜索结果想按距离排序」），据此修改接口参数或表字段，并在设计文档里记录修改前后的对比。","priority":"P0","week":2,"expected_output":"一份迭代记录：3 条反馈 + 修改前后的接口/表结构对比 + 修改后的代码提交记录","completion_criteria":"迭代记录中至少有 1 个接口和 1 张表结构发生了可验证的改动，且改动与反馈一一对应","basis":"功能设计与迭代","estimated_hours":3},{"title":"给二手交易平台加接口耗时日志，采集 5 个核心接口的响应时间并找出最慢的一个","detail":"用 Spring Boot 拦截器或 AOP 记录每个接口耗时，本地跑 20 次请求，把结果整理成表。","priority":"P0","week":2,"expected_output":"一份接口耗时统计表（5 个接口各 20 次请求的耗时）和一句结论：最慢接口是哪个","completion_criteria":"统计表里 5 个接口都有数据，且明确标出了耗时最高的接口及其平均耗时","basis":"数据跟踪与迭代优化","estimated_hours":3},{"title":"针对最慢接口做一次优化（加索引或改查询），对比优化前后的耗时数据","detail":"根据上一条找到的最慢接口，用 EXPLAIN 看执行计划或加索引，重新跑 20 次请求记录耗时。","priority":"P1","week":2,"expected_output":"一份优化前后耗时对比表（同一接口各 20 次请求）和优化说明（改了什么、为什么）","completion_criteria":"优化后平均耗时比优化前下降至少 20%，对比表和说明齐全","basis":"数据跟踪与迭代优化","estimated_hours":2},{"title":"为二手交易平台的 3 个核心接口补写单元测试并通过","detail":"选发布商品、查询列表、下单这 3 个接口，用 JUnit 写单元测试，覆盖正常和异常入参。","priority":"P1","week":1,"expected_output":"3 个接口的单元测试代码文件 + 测试运行通过的截图或日志","completion_criteria":"3 个接口每个至少 2 条测试用例（1 正常 + 1 异常），全部运行通过","basis":"编写单元测试与技术文档，配合测试完成验收","estimated_hours":3},{"title":"为二手交易平台写 README 与接口文档（含启动步骤、接口说明、表结构说明）","detail":"README 写项目背景、启动步骤、目录结构；接口文档逐个说明 8 个接口的请求方式、参数、返回示例。","priority":"P1","week":2,"expected_output":"一份 README.md 和一份接口文档（覆盖 8 个接口，每个都有请求与返回示例）","completion_criteria":"README 能让另一个人按步骤把项目跑起来，接口文档 8 个接口无遗漏且每个都有返回示例","basis":"编写单元测试与技术文档，配合测试完成验收","estimated_hours":2},{"title":"用 Spring Boot 写一个最小可运行的 REST 接口 demo 并跑通","detail":"建一个 Spring Boot 工程，实现一个 GET 接口返回 JSON，启动后用浏览器或 curl 验证。","priority":"P2","week":1,"expected_output":"一个可运行的 Spring Boot demo 工程和一次接口调用成功的截图或日志","completion_criteria":"工程能启动且 GET 接口返回预期 JSON，截图或日志可证明调用成功","basis":"Spring / Spring Boot 框架了解","estimated_hours":1}],"total_hours":20,"estimated_hours":20,"trimmed_count":0,"trimmed_note":"","uncovered":["本科及以上在读，计算机相关专业优先"],"violations":[]}};
+const BUILD_META = { version: '1.0.0', built_at: '2026-11-11 05:06' };
+
+/**
+ * 知涯 ZHIYA · MVP 前端逻辑
+ * 所有分析结果来自 POST /api/analysis，不再有写死的示例文案。
+ */
+
+/* ---------- 后端地址自适应 ----------
+ * 页面可能从三种地方打开：
+ *   1) 后端同源        http://127.0.0.1:5178/          → 用相对路径即可
+ *   2) 静态预览面板    http://127.0.0.1:<其他端口>/     → 相对路径会打到错误的服务器
+ *   3) 直接双击 html  file://                          → 相对路径完全不可用
+ * 因此这里探测候选后端地址，探测到就用绝对地址，探测不到再退回相对路径并给出明确指引。
+ *
+ * 注意：每个候选都必须带超时。预览服务器对未知路径可能既不返回 404 也不返回 200
+ * （直接挂起），没有超时的话探测会卡在第一个候选上，永远走不到真正可用的地址。
+ */
+const API_CANDIDATES = [
+  '',                                    // 同源优先
+  'http://127.0.0.1:5178',
+  'http://localhost:5178',
+];
+let API_BASE = '';
+let API_READY = false;
+
+const PROBE_TIMEOUT_MS = 1500;
+
+/** 带超时的 fetch —— 防止候选地址挂起导致探测卡死 */
+async function fetchWithTimeout(url, opts = {}, timeoutMs = PROBE_TIMEOUT_MS) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...opts, signal: ctrl.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * 探测后端可用性。
+ * @returns {string|null} 可用的 base 地址；返回 '' 表示「同源可用」——
+ *   空字符串是有效结果，判断成败必须用 `=== null`，不能用 `!base`。
+ *   同源是首选场景（从 http://127.0.0.1:5178 打开），这里最容易踩坑。
+ */
+async function detectApiBase() {
+  API_READY = false;
+  // file:// 打开时相对路径会解析成 file:///...，浏览器直接拒绝，跳过同源候选
+  const proto = (typeof location !== 'undefined' && location.protocol) || 'http:';
+  const isFileProtocol = proto === 'file:';
+  const candidates = isFileProtocol ? API_CANDIDATES.slice(1) : API_CANDIDATES;
+  for (const base of candidates) {
+    try {
+      const res = await fetchWithTimeout(`${base}/api/health`, { method: 'GET' });
+      if (!res.ok) continue;
+      // 必须是我们的 health 结构 —— 预览服务器可能返回 200 + HTML 或别的 JSON
+      const text = await res.text();
+      let data = null;
+      try { data = JSON.parse(text); } catch (_) { continue; }
+      if (data && data.ok === true) {
+        API_BASE = base;
+        API_READY = true;
+        return base;
+      }
+    } catch (_) {
+      // 该候选不可用（超时 / 网络错误 / 非 JSON），试下一个
+    }
+  }
+  return null;
+}
+
+const apiUrl = (path) => `${API_BASE}${path}`;
+
+/* ---------- 健壮的响应解析 ----------
+ * 后端返回 404 时，Express 会给一段纯文本 "Not Found"，
+ * 直接 res.json() 会抛 "Unexpected token 'N'"，把技术噪音甩给用户。
+ * 这里先读 text 再判断能不能解析成 JSON。
+ */
+async function parseResponse(res) {
+  const text = await res.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch (_) {
+    data = null;
+  }
+  if (data === null && text) {
+    // 响应不是 JSON —— 多半是打到了错误的服务器（如静态预览面板）
+    const snippet = text.trim().slice(0, 60);
+    const err = new Error(`服务器返回了非 JSON 内容：${snippet}`);
+    err.code = 'non_json_response';
+    err.status = res.status;
+    throw err;
+  }
+  return { ok: res.ok, status: res.status, data: data || {} };
+}
+
+/** 把异常翻译成人话，并区分场景 */
+function explainError(err, fallbackMsg) {
+  if (err?.code === 'non_json_response') {
+    return {
+      title: '连接到了错误的服务器',
+      msg: '当前页面不是从知涯后端打开的，知涯找不到 AI 接口。请用后端地址打开页面：',
+      hint: 'http://127.0.0.1:5178',
+      code: err.status,
+    };
+  }
+  if (err?.name === 'TypeError' && /fetch|network/i.test(err.message || '')) {
+    return {
+      title: '连不上知涯后端',
+      msg: '后端可能没启动。在项目目录执行下面这行命令启动它：',
+      hint: 'bash start.sh',
+      code: '',
+    };
+  }
+  return { title: '这一步没成功', msg: fallbackMsg, hint: '', code: err?.code || '' };
+}
+
+const state = {
+  rawText: '',
+  followups: [],
+  jdText: '',
+  weeklyHours: 10,
+  result: null,        // 最近一次接口返回
+  baseResultId: null,  // F6 重算的基准
+  selectedDirection: null,
+  excludedTasks: new Set(),
+  askShown: false,
+  demoMode: false,     // 演示模式：跳过模型调用，用预置快照
+  /* 内测采集 */
+  participant: '',     // 匿名编号，如 cq-07
+  track: '',           // 求职方向：test/dev/pm/backend/other
+  fb: {},              // 问卷答案
+};
+
+const $ = (id) => document.getElementById(id);
+
+/* ---------- 内测埋点 ----------
+ * 只上报匿名编号 + 节点名，不含任何身份信息。
+ * 上报失败绝不打扰用户（静默忽略）。
+ *
+ * 离线单文件版（file:// 协议）下完全没有后端，此时直接跳过，
+ * 否则控制台会刷一串 net::ERR_CONNECTION_REFUSED，演示时很难看。
+ */
+const IS_FILE_PROTOCOL = location.protocol === 'file:';
+
+function telemetry(step, meta) {
+  if (!state.participant) return;
+  if (IS_FILE_PROTOCOL) return;   // 离线版无后端，不埋点
+  try {
+    fetch(`${apiUrl('/api/telemetry')}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        participant: state.participant,
+        step,
+        track: state.track,
+        meta: meta || {},
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch (_) { /* 埋点失败不影响主流程 */ }
+}
+
+/* ---------- 屏幕切换 ---------- */
+const NAMES = {
+  s1: '01 首页', s2: '02 背景录入', s3: '03 追问', s4: '04 岗位方向',
+  s5: '05 能力差距分析', s6: '06 两周行动计划', s7: '07 确认调整', s8: '08 AI 处理中',
+  s9: '09 使用反馈',
+};
+const dots = $('dots');
+Object.keys(NAMES).forEach((k) => {
+  const d = document.createElement('div');
+  d.className = 'dot';
+  d.textContent = String(Object.keys(NAMES).indexOf(k) + 1).padStart(2, '0');
+  d.onclick = () => go(k);
+  dots.appendChild(d);
+});
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach((s) => s.classList.remove('on'));
+  $(id).classList.add('on');
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.classList.toggle('on', Object.keys(NAMES)[i] === id);
+  });
+  $('sbName').textContent = '知涯 ZHIYA · ' + NAMES[id];
+
+  // 漏斗埋点：进入该屏即视为到达该节点
+  const step = SCREEN_STEP[id];
+  if (step) telemetry(step);
+}
+
+/* ---------- 漏斗埋点：屏幕进入即算到达 ---------- */
+const SCREEN_STEP = {
+  s1: 'visit',
+  s2: 'input_start',
+  s4: 'jd_done',
+  s5: 'view_gap',
+  s6: 'view_plan',
+  s9: 'feedback',
+};
+
+/* ---------- 通用事件 ---------- */
+document.addEventListener('click', (e) => {
+  const g = e.target.closest('[data-go]');
+  if (g) { go(g.getAttribute('data-go')); return; }
+  const t = e.target.closest('[data-toggle]');
+  if (t) { $('ask').classList.toggle('on'); }
+});
+
+/* ---------- 02 背景录入 ---------- */
+const rawTa = $('rawText');
+rawTa.addEventListener('input', () => {
+  state.rawText = rawTa.value;
+  const n = state.rawText.trim().length;
+  const ok = n >= 10;
+  $('btnParse').classList.toggle('dis', !ok);
+  $('btnParse').disabled = !ok;   // 真正的禁用：阻止点击与键盘触发
+  $('rawCount').textContent = `${n} 字`;
+});
+
+$('btnParse').onclick = () => {
+  if (state.rawText.trim().length < 10) return;
+  telemetry('input_done');
+  startAnalysis();
+};
+
+$('jdSample').onclick = () => {
+  $('jdText').value = SAMPLE_JD;
+  onJdInput();
+};
+
+const SAMPLE_JD = `AI 产品经理实习生（校园招聘）
+岗位职责：
+1. 参与 AI 产品的需求调研、功能设计与迭代；
+2. 撰写产品需求文档（PRD），推动研发与测试团队落地；
+3. 跟踪数据表现，输出迭代优化方案。
+任职要求：
+1. 本科及以上在读，计算机、信息管理、心理学等相关专业优先；
+2. 具备较强的逻辑思考与结构化表达能力；
+3. 熟悉至少一种大模型 API，有调用实践经验者优先；
+4. 有产品竞赛、校园活动组织或自媒体运营经验者优先；
+5. 熟练使用 Axure/Figma 等原型工具加分。`;
+
+function onJdInput() {
+  const v = $('jdText').value;
+  state.jdText = v;
+  $('jdCount').textContent = `${v.length} 字`;
+  const ok = v.trim().length >= 20;
+  $('btnToGap').classList.toggle('dis', !ok);
+  $('btnToGap').disabled = !ok;
+  $('footNote').textContent = ok ? 'JD 已就绪，可以开始解析' : '粘贴 JD 后开始解析';
+}
+$('jdText').addEventListener('input', onJdInput);
+
+/* ---------- 04 → 触发分析 ---------- */
+/* 04 页「继续」：还没分析过就发起分析；已分析过就直接进入 05 差距分析 */
+$('btnToGap').onclick = () => {
+  telemetry('jd_done');
+  if (state.result && state.result.gap_report) {
+    go('s5');
+    return;
+  }
+  telemetry('analysis_start');
+  startAnalysis();
+};
+$('btnAnother').onclick = () => { startAnalysis({ keepDirection: false }); };
+$('navRegen').onclick = () => { startAnalysis(); };
+
+/* 05 页「继续生成行动计划」：进入 06 页 */
+$('btnToPlan').onclick = () => {
+  if (!state.result || !state.result.action_plan) {
+    showError({
+      title: '还没有生成行动计划',
+      msg: '请先完成能力差距分析。',
+      hint: '',
+      code: '',
+    });
+    return;
+  }
+  go('s6');
+};
+
+/* ---------- 08 加载态 ---------- */
+const STEP_LABELS = [
+  ['profile', '解析你的经历档案'],
+  ['jd_profile', '拆解岗位能力要求'],
+  ['gap_report', '逐条对照能力差距'],
+  ['action_plan', '生成两周行动计划'],
+];
+
+function showLoading(msg, sub) {
+  $('s8body').innerHTML = `
+    <div class="loading">
+      <div class="spin"></div>
+      <div class="ltext">${msg}</div>
+      <div class="lsub">${sub}</div>
+      <div class="steps" id="loadSteps">
+        ${STEP_LABELS.map((s, i) => `
+          <div class="step" data-step="${s[0]}">
+            <span class="dot"></span><span>${s[1]}</span>
+          </div>`).join('')}
+      </div>
+      <div class="loadnote" id="loadNote">正在提交…</div>
+    </div>`;
+  $('s8foot').innerHTML = '<div class="fnote">通常需要 20–40 秒，请不要关闭</div>';
+  $('back8').onclick = () => go('s2');
+  $('nav8r').textContent = '';
+  go('s8');
+}
+
+function markStep(step, done) {
+  const el = document.querySelector(`[data-step="${step}"]`);
+  if (!el) return;
+  el.classList.toggle('on', !done);
+  el.classList.toggle('done', done);
+}
+
+/* ---------- 进度轮询 ----------
+ * 分析要跑 20–90 秒（网络不稳时模型会重试，耗时可能翻倍）。
+ * 只显示一个转圈会让用户以为卡死，所以轮询后端进度接口：
+ *   - 实时点亮对应的步骤（用户知道跑到第几步了）
+ *   - 正在重试时明确告知「网络不稳，正在重试」
+ *
+ * 后端返回的是中文步骤文案，这里映射回前端的 step key。
+ */
+const BACKEND_STEP_TO_KEY = {
+  '正在解析你的经历': 'profile',
+  '正在拆解岗位要求': 'jd_profile',
+  '正在逐条对照能力差距': 'gap_report',
+  '正在生成两周行动计划': 'action_plan',
+};
+
+let progressTimer = null;
+
+function startProgressPolling(requestId) {
+  stopProgressPolling();
+  if (!requestId || IS_FILE_PROTOCOL) return;
+
+  progressTimer = setInterval(async () => {
+    try {
+      const res = await fetch(apiUrl(`/api/progress?requestId=${encodeURIComponent(requestId)}`));
+      if (!res.ok) return;
+      const p = await res.json();
+      if (!p.found) return;
+
+      // 点亮当前步骤
+      const key = BACKEND_STEP_TO_KEY[p.step];
+      if (key) {
+        STEP_LABELS.forEach(([k]) => {
+          if (k === key) markStep(k, false);
+        });
+      }
+
+      // 重试中：把提示写进加载页，用户知道不是卡死
+      const note = $('loadNote');
+      if (note) {
+        if (p.retrying) {
+          note.textContent = `网络不稳，正在自动重试（第 ${p.attempts} 次）…请不要关闭`;
+          note.style.color = 'var(--up-t)';
+        } else if (p.step) {
+          note.textContent = `当前进度：${p.step}　已等待 ${Math.round(p.elapsed_ms / 1000)} 秒`;
+          note.style.color = '';
+        }
+      }
+    } catch (_) { /* 轮询失败不影响主流程 */ }
+  }, 1500);
+}
+
+function stopProgressPolling() {
+  if (progressTimer) {
+    clearInterval(progressTimer);
+    progressTimer = null;
+  }
+}
+
+/* ---------- 主流程 ---------- */
+async function startAnalysis(opts = {}) {
+  const raw = state.rawText.trim();
+  const jd = state.jdText.trim();
+
+  if (raw.length < 10) {
+    go('s2');
+    return;
+  }
+  if (jd.length < 20) {
+    go('s4');
+    $('footNote').textContent = '先把目标岗位的 JD 贴进来，知涯才知道企业要什么';
+    return;
+  }
+
+  showLoading('正在对照你的经历和这个岗位…', '四步分析在同一个接口里串行执行，网络不稳时会自动重试');
+  markStep('profile', false);
+
+  // 每次请求前确认后端可达（页面可能被从任意端口打开）
+  if (!API_READY) {
+    const base = await detectApiBase();
+    // base 为 '' 表示同源可用，是有效结果；只有 null 才算探测失败
+    if (base === null) {
+      // 单文件版：内置快照存在时直接用内置结果，不打断用户
+      if (typeof BUILTIN_SNAPSHOT !== 'undefined' && BUILTIN_SNAPSHOT) {
+        applyResult(BUILTIN_SNAPSHOT, '离线模式 · 后端未连接，当前展示内置的真实分析结果');
+        return;
+      }
+      showError({
+        title: '连不上知涯后端',
+        msg: '后端没有响应。可以点下方「用预置结果演示」继续展示完整流程。',
+        hint: 'bash start.sh',
+        code: '',
+      });
+      return;
+    }
+  }
+
+  // 生成 requestId，让前端能轮询后端进度（第几步、有没有在重试）
+  const requestId = (crypto.randomUUID ? crypto.randomUUID()
+    : `req-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+
+  try {
+    const res = await fetch(apiUrl('/api/analysis'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        raw_text: raw,
+        followups: state.followups,
+        jd_text: jd,
+        weekly_hours: state.weeklyHours,
+        // 演示模式：直接返回预置快照，跳过模型调用
+        demo: state.demoMode ? true : undefined,
+        // 内测采集：匿名编号与方向，用于算漏斗与效果指标
+        participant: state.participant || undefined,
+        track: state.track || undefined,
+        requestId,
+      }),
+    });
+
+    // 请求已发出，开始轮询进度
+    startProgressPolling(requestId);
+
+    const { ok, data } = await parseResponse(res);
+    stopProgressPolling();
+
+    if (!ok) {
+      showError({
+        title: '这一步没成功',
+        msg: data.message || '解析失败，请重试。',
+        hint: '',
+        code: data.error || '',
+      });
+      return;
+    }
+
+    applyResult(data);
+  } catch (err) {
+    stopProgressPolling();
+    showError(explainError(err, '解析失败，请重试。'));
+  }
+}
+
+/** 演示模式提示条：让观众清楚知道这是预置结果，而不是现场跑的 */
+function showDemoBanner(customText) {
+  const b = document.getElementById('demoBanner');
+  if (b) return;
+  const banner = document.createElement('div');
+  banner.id = 'demoBanner';
+  banner.className = 'demoBanner';
+  banner.textContent = customText || '演示模式 · 以下为预置分析结果（真实模型产出，非现场生成）';
+  const s4 = document.getElementById('s4');
+  const pad = s4.querySelector('.pad');
+  if (pad) pad.insertBefore(banner, pad.firstChild);
+}
+
+/**
+ * 渲染一份分析结果到各页面。
+ * 正常路径与离线降级路径共用，保证行为一致。
+ */
+function applyResult(data, bannerText) {
+  state.result = data;
+  state.baseResultId = data.result_id || 'builtin';
+
+  renderJd(data.jd_profile);
+  renderDirections(data.directions, data.meta?.directions_failed);
+  renderGap(data.gap_report, data.jd_profile);
+  renderPlan(data.action_plan);
+
+  go('s4');
+  const isDemo = data.meta?.is_demo;
+  const retries = data.meta?.retries || 0;
+  const secs = data.meta?.elapsed_ms ? Math.round(data.meta.elapsed_ms / 1000) : '—';
+  $('footNote').textContent = isDemo
+    ? '预置结果（真实模型产出）'
+    : retries > 0
+      ? `已解析 · ${secs} 秒（网络不稳，自动重试 ${retries} 次）`
+      : `已解析 · ${secs} 秒`;
+  if (bannerText) showDemoBanner(bannerText);
+  else if (isDemo) showDemoBanner();
+
+  // 内测：分析完成节点上报（非演示模式才计，演示结果不是用户跑出来的）
+  if (!isDemo) telemetry('analysis_done', {
+    elapsed_ms: data.meta?.elapsed_ms || 0,
+    model: data.meta?.model || 'unknown',
+  });
+
+  // 加内测参与者时，结果页底部给一个「去反馈」入口
+  if (state.participant) addFeedbackEntry();
+}
+
+/**
+ * 在结果页（s6 行动计划）加入「去反馈」入口。
+ * 内测模式才显示 —— 没有参与者编号的用户不该被问反馈。
+ *
+ * 入口放在导航栏（固定可见，滚动到底也在那），而不是滚动区末尾：
+ * 滚动区内容长时末尾按钮在视口外，真人和自动化都点不到。
+ */
+function addFeedbackEntry() {
+  if ($('navFb')) {
+    $('navFb').style.display = '';
+    return;
+  }
+  const nav = $('s6').querySelector('.nav');
+  if (!nav) return;
+
+  const link = document.createElement('div');
+  link.className = 'nav-r fbNav';
+  link.id = 'navFb';
+  link.style.marginLeft = '14px';
+  link.textContent = '反馈';
+  link.onclick = () => go('s9');
+  nav.appendChild(link);
+}
+
+/**
+ * 错误展示：说人话，并给出可执行的下一步
+ * @param {object|string} info { title, msg, hint, code } 或纯文案
+ */
+function showError(info) {
+  const e = typeof info === 'string' ? { title: '这一步没成功', msg: info, hint: '', code: '' } : info;
+  const isConnIssue = /连接|后端/.test(e.title);
+
+  $('s8body').innerHTML = `
+    <div style="margin-top:60px">
+      <div class="errbox">
+        <div class="et">${esc(e.title)}</div>
+        <div class="em">${esc(e.msg)}</div>
+        ${e.hint ? `
+          <div class="cmdfix">
+            <div class="cmdfix-l">${isConnIssue ? '启动命令' : '正确地址'}</div>
+            <code>${esc(e.hint)}</code>
+          </div>` : ''}
+        ${e.code ? `<div class="ecode">${esc(e.code)}</div>` : ''}
+        <div class="btn3" id="btnRetry">重新试一次</div>
+      </div>
+      <div class="honest" style="margin-top:16px">你输入的内容还在，<b>不会丢</b>。</div>
+    </div>`;
+  $('s8foot').innerHTML = '';
+  $('btnRetry').onclick = () => {
+    // 重试前重新探测一次后端，覆盖「后端刚启动」的情况
+    API_READY = false;
+    startAnalysis();
+  };
+  go('s8');
+}
+
+/* ---------- 渲染：JD 能力清单 ---------- */
+const CAT_LABEL = {
+  duty: '工作职责', must_skill: '必备技能', plus_skill: '加分项', major_req: '专业要求',
+};
+
+function renderJd(jd) {
+  if (!jd) { $('jdList').innerHTML = ''; $('jdSec').style.display = 'none'; return; }
+  const reqs = jd.requirements || [];
+  $('jdSec').style.display = '';
+  $('jdCount2').textContent = `共 ${reqs.length} 项`;
+  $('jdList').innerHTML = reqs.map((r) => `
+    <div class="card">
+      <div class="hd">
+        <span class="ct">${esc(r.item)}</span>
+        <span class="tag ${r.importance === 'required' ? 'tu' : 'tk'}">${r.importance === 'required' ? '必备' : '加分'}</span>
+      </div>
+      <div class="l2">${esc(r.evidence || '')}</div>
+      <div class="tags"><span class="tg2 tb1">${CAT_LABEL[r.category] || r.category}</span></div>
+    </div>`).join('');
+}
+
+/* ---------- 渲染：方向卡 ---------- */
+const LEVEL_TAG = { '匹配度较高': 'th', '可尝试': 'tu', '可探索': 'tk' };
+
+function renderDirections(list, directionsFailed) {
+  const box = $('dirList');
+  if (!list || !list.length) {
+    // 区分两种空态：模型调用失败 vs 模型确实没给出方向。
+    // 前者是网络/服务问题，用户重试有意义；后者是信息不足，要引导补充经历。
+    box.innerHTML = directionsFailed
+      ? `<div class="card"><div class="l2">方向建议这次没生成出来（网络或模型服务波动）。
+         <br>能力差距分析与行动计划不受影响，可以继续往下看；要新的方向建议稍后重试即可。</div></div>`
+      : `<div class="card"><div class="l2">这次没能给出可靠的方向建议，建议在下方补充更具体的经历后重试。</div></div>`;
+    $('dirCount').textContent = '0 个';
+    return;
+  }
+  $('dirCount').textContent = `共 ${list.length} 个`;
+  box.innerHTML = list.map((d, i) => `
+    <div class="card dcard ${i === 0 ? 'sel' : ''}" data-dir="${esc(d.role)}">
+      <div class="dt">${esc(d.role)}</div>
+      <div class="l1">${esc(d.reason)}</div>
+      ${d.uncertainty ? `<div class="l1p" style="margin-top:8px">但你未提及${esc(d.uncertainty.replace(/^你未提及/, ''))}</div>` : ''}
+      ${(d.matched_evidence || []).length ? `
+        <div class="evid"><span class="ei">依据来源</span>${d.matched_evidence.map(esc).join('<br>')}</div>` : ''}
+      <div class="tags">
+        <span class="tg2 ${LEVEL_TAG[d.match_level] || 'tk'}">${esc(d.match_level)}</span>
+        <span class="tg2 tb1">${(d.matched_evidence || []).length} 条可用证据</span>
+      </div>
+    </div>`).join('');
+
+  box.querySelectorAll('.dcard').forEach((c) => {
+    c.onclick = () => {
+      box.querySelectorAll('.dcard').forEach((x) => x.classList.remove('sel'));
+      c.classList.add('sel');
+      state.selectedDirection = c.getAttribute('data-dir');
+    };
+  });
+  state.selectedDirection = list[0]?.role || null;
+}
+
+/* ---------- 渲染：差距报告 ---------- */
+const STATUS_LABEL = { have: '已有', improve: '待提升', unknown: '信息不足' };
+
+function renderGap(gap, jd) {
+  const box = $('gapList');
+  const items = gap?.items || [];
+  if (!items.length) {
+    box.innerHTML = '<div class="card"><div class="l2">这次没对照出差距项，请重试。</div></div>';
+    $('gapCount').textContent = '0 项';
+    return;
+  }
+  const s = gap.summary || {};
+  $('gapCount').textContent = `共 ${s.total || items.length} 项`;
+  $('gapRole').textContent = jd?.role_name || state.selectedDirection || '—';
+  $('gapFamily').textContent = s.have ? `已有 ${s.have}` : s.unknown ? `待补充 ${s.unknown}` : '—';
+  $('gapNote').textContent =
+    `已对照 ${s.total || items.length} 项 · 已有 ${s.have || 0} · 待提升 ${s.improve || 0} · 待补充 ${s.unknown || 0}`;
+
+  box.innerHTML = items.map((it, i) => {
+    const cls = it.status === 'unknown' ? 'unknown' : '';
+    const tagCls = it.status === 'have' ? 'th' : it.status === 'improve' ? 'tu' : 'tk';
+    return `
+    <div class="gapcard ${cls}">
+      <div class="hd">
+        <span class="gname">${esc(it.requirement)}</span>
+        <span class="tag ${tagCls}">${STATUS_LABEL[it.status]}</span>
+      </div>
+      ${it.evidence ? `<div class="evidence">${esc(it.evidence)}</div>` : ''}
+      ${it.basis ? `<div class="basis"><span class="bl">判断依据</span>${esc(it.basis)}</div>` : ''}
+      ${it.advice ? `<div class="advice"><span class="al">建议</span>${esc(it.advice)}</div>` : ''}
+      ${it.prompt ? `<div class="promptrow"><div class="plabel">补充指引</div><div class="ptext">${esc(it.prompt)}</div></div>` : ''}
+      ${it.status === 'unknown' ? `<button class="addlink" data-supplement="${i}">点击补充这段经历 ›</button>` : ''}
+    </div>`;
+  }).join('');
+
+  box.querySelectorAll('[data-supplement]').forEach((b) => {
+    b.onclick = () => {
+      const idx = Number(b.getAttribute('data-supplement'));
+      const it = items[idx];
+      state.followups = state.followups.filter((f) => f.question !== it.prompt);
+      state.followups.push({ question: it.prompt, answer: '' });
+      $('rawText').value = state.rawText;
+      $('ask').classList.add('on');
+      go('s2');
+    };
+  });
+}
+
+/* ---------- 渲染：行动计划 ---------- */
+function renderPlan(plan) {
+  const box = $('planList');
+  const tasks = plan?.tasks || [];
+  if (!tasks.length) {
+    box.innerHTML = '<div class="card"><div class="l2">这次没生成任务，请重试。</div></div>';
+    $('planSummary').textContent = '共 0 个任务';
+    return;
+  }
+  const total = plan.total_hours || tasks.reduce((s, t) => s + (t.estimated_hours || 0), 0);
+  $('planSummary').textContent = `共 ${tasks.length} 个任务 · 每周可投入 ${state.weeklyHours} 小时`;
+
+  const w1 = tasks.filter((t) => t.week === 1);
+  const w2 = tasks.filter((t) => t.week === 2);
+  const render = (t) => `
+    <div class="task">
+      <div class="taskh">
+        <span class="pt ${t.priority === 'P1' ? 'p1' : t.priority === 'P2' ? 'p2' : ''}">${t.priority}</span>
+        <span class="tt">${esc(t.title)}</span>
+        <span class="thrs">${t.estimated_hours}h</span>
+      </div>
+      ${t.detail ? `<div class="tsub">${esc(t.detail)}</div>` : ''}
+      <div class="hr"></div>
+      <div class="kv"><i>预期产出</i><b>${esc(t.expected_output)}</b></div>
+      <div class="kv"><i>完成标准</i><b>${esc(t.completion_criteria)}</b></div>
+      <div class="kv"><i>依据</i><b>${esc(t.basis)}</b></div>
+    </div>`;
+
+  box.innerHTML =
+    (w1.length ? `<div class="week">第 1 周 · 起步</div>${w1.map(render).join('')}` : '') +
+    (w2.length ? `<div class="week">第 2 周 · 成果固化</div>${w2.map(render).join('')}` : '');
+
+  const warn = [];
+  if (plan.trimmed_count > 0) warn.push(`已按你的时间裁剪 ${plan.trimmed_count} 个任务`);
+  if ((plan.uncovered || []).length) warn.push(`${plan.uncovered.length} 项需要你补充具体目标`);
+  $('planWarn').innerHTML = warn.length
+    ? `<div class="honest" style="margin-top:6px">${warn.map(esc).join('<br>')}</div>` : '';
+  $('planFoot').textContent = `已生成 ${tasks.length} 个任务 · 预计 ${total} 小时`;
+}
+
+/* ---------- 07 确认调整 ---------- */
+$('hours').addEventListener('input', (e) => {
+  state.weeklyHours = Number(e.target.value);
+  $('hoursVal').textContent = `${state.weeklyHours} 小时/周`;
+  const tasks = state.result?.action_plan?.tasks || [];
+  const total = tasks.reduce((s, t) => s + (t.estimated_hours || 0), 0);
+  const cap = state.weeklyHours * 2;
+  const pct = Math.min(100, Math.round((total / cap) * 100));
+  $('sumBar').style.width = `${pct}%`;
+  $('hoursHint').textContent = total > cap
+    ? `当前计划 ${total} 小时，超出可投入 ${cap} 小时，重排时会自动裁剪`
+    : state.weeklyHours >= 16 ? '时间较多，可以再增加任务' : '时间刚好，按这个节奏走就行';
+  $('sumTitle').textContent = `${tasks.length} 个任务 · 预计 ${total} 小时`;
+  $('sumSub').textContent = `两周可投入 ${cap} 小时`;
+});
+
+$('navRegen2').onclick = () => { regenerate(['weekly_hours']); };
+
+function renderTaskList() {
+  const tasks = state.result?.action_plan?.tasks || [];
+  const box = $('taskList');
+  box.innerHTML = tasks.map((t, i) => `
+    <div class="kvrow">
+      <div class="box ${state.excludedTasks.has(i) ? 'e' : ''}" data-idx="${i}">${state.excludedTasks.has(i) ? '' : '✓'}</div>
+      <span style="${state.excludedTasks.has(i) ? 'text-decoration:line-through;color:var(--t4)' : ''}">${esc(t.title)}</span>
+    </div>`).join('');
+  box.querySelectorAll('[data-idx]').forEach((b) => {
+    b.onclick = () => {
+      const i = Number(b.getAttribute('data-idx'));
+      if (state.excludedTasks.has(i)) state.excludedTasks.delete(i);
+      else state.excludedTasks.add(i);
+      renderTaskList();
+    };
+  });
+}
+
+$('btnPlanDone').onclick = () => {
+  renderTaskList();
+  const tasks = state.result?.action_plan?.tasks || [];
+  const total = tasks.reduce((s, t) => s + (t.estimated_hours || 0), 0);
+  $('sumTitle').textContent = `${tasks.length} 个任务 · 预计 ${total} 小时`;
+  $('sumSub').textContent = `两周可投入 ${state.weeklyHours * 2} 小时`;
+  go('s7');
+};
+
+$('btnStart').onclick = () => {
+  const excluded = [...state.excludedTasks];
+  if (excluded.length) {
+    regenerate(['weekly_hours'], excluded);
+    return;
+  }
+  go('s1');
+};
+
+/* ---------- F6 重算 ---------- */
+async function regenerate(changedFields, excludedIds = []) {
+  if (!state.baseResultId) { startAnalysis(); return; }
+  showLoading('正在重新生成…', '只重跑受影响的步骤，其余结果保留');
+  try {
+    const res = await fetch(apiUrl('/api/analysis/regenerate'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        base_result_id: state.baseResultId,
+        changed_fields: changedFields,
+        weekly_hours: state.weeklyHours,
+        raw_text: state.rawText,
+        jd_text: state.jdText,
+        excluded_items: excludedIds,
+      }),
+    });
+    const { ok, data } = await parseResponse(res);
+    if (!ok || data.fallback_available) {
+      showError({
+        title: '重新生成失败',
+        msg: data.message || '重新生成失败，可继续使用原结果。',
+        hint: '',
+        code: data.error || '',
+      });
+      return;
+    }
+    state.result = data;
+    state.baseResultId = data.result_id;
+    state.excludedTasks = new Set();
+
+    renderGap(data.gap_report, data.jd_profile);
+    renderPlan(data.action_plan);
+    showDiff(data);
+  } catch (err) {
+    showError(explainError(err, '网络异常，原结果仍可继续使用。'));
+  }
+}
+
+function showDiff(data) {
+  const diff = data.diff || { items: [], changed_count: 0 };
+  const scope = data.recomputed_scope || [];
+  const scopeText = { profile: '经历解析', jd_profile: 'JD 解析', gap_report: '能力差距', action_plan: '行动计划' };
+
+  $('s8body').innerHTML = `
+    <div style="margin-top:24px">
+      <div style="font-size:18px;font-weight:500;color:var(--t1);margin-bottom:6px">这次重算了什么</div>
+      <div style="font-size:12px;color:var(--t3);margin-bottom:16px">
+        ${scope.map((s) => scopeText[s] || s).join(' → ') || '无'}　·　${diff.changed_count} 处结论变化
+      </div>
+      <div class="card" style="padding:6px 16px">
+        ${diff.items.length ? diff.items.map((d) => `
+          <div class="diffrow">
+            <span class="dchip ${d.changed ? 'dchg' : 'dsame'}">${d.changed ? '已变化' : '未变化'}</span>
+            <span class="dkey">
+              <b>${esc(d.key)}</b>
+              ${d.changed ? `
+                <span class="dside"><s>${esc(fmt(d.before))}</s></span>
+                <span class="dside darrow">↓</span>
+                <span class="dside">${esc(fmt(d.after))}</span>` : ''}
+            </span>
+          </div>`).join('') : '<div style="padding:14px 0;font-size:13px;color:var(--t3)">这次修改没有改变任何结论——通常说明你补的信息没有触及差距判断的依据。</div>'}
+      </div>
+      <div class="honest" style="margin-top:16px"><b>结论没变不一定是坏事。</b><br>知涯不会为了让页面「看起来更新了」而强行改变判断。</div>
+    </div>`;
+  $('s8foot').innerHTML = '<div class="btn" id="btnAccept">采用新结果</div>';
+  $('btnAccept').onclick = () => { go('s6'); };
+  $('back8').onclick = () => go('s6');
+  $('nav8r').textContent = '';
+  go('s8');
+}
+
+function fmt(v) {
+  if (v === null || v === undefined) return '（无）';
+  if (typeof v === 'object') {
+    if (v.status) return `状态 ${v.status}`;
+    return JSON.stringify(v);
+  }
+  return String(v);
+}
+
+/* ---------- 工具 ---------- */
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/* ---------- 演示模式 ----------
+ * 面试现场的安全绳：断网或模型超时时，一键切换到预置结果继续演示。
+ * 预置结果是真实模型跑出来的快照，不是手写假数据。
+ */
+const DEMO_RAW = `我是计算机专业大三学生。
+上学期做了一个校园二手交易平台的课程项目，我负责后端接口和数据库设计，用 Java 写的，一共做了 8 个接口。
+我还参加过学校程序设计竞赛拿了个三等奖，题目是动态规划。
+平时喜欢刷 LeetCode，目前做完了 200 多道题。
+没有实习经历，也没参加过产品相关的活动。`;
+
+const DEMO_JD = `AI 产品经理实习生（校园招聘）
+岗位职责：
+1. 参与 AI 产品的需求调研、功能设计与迭代；
+2. 撰写产品需求文档（PRD），推动研发与测试团队落地；
+3. 跟踪数据表现，输出迭代优化方案。
+任职要求：
+1. 本科及以上在读，计算机、信息管理、心理学等相关专业优先；
+2. 具备较强的逻辑思考与结构化表达能力；
+3. 熟悉至少一种大模型 API，有调用实践经验者优先；
+4. 有产品竞赛、校园活动组织或自媒体运营经验者优先；
+5. 熟练使用 Axure/Figma 等原型工具加分。`;
+
+function toggleDemoMode() {
+  state.demoMode = !state.demoMode;
+  const btn = $('btnDemoToggle');
+  btn.classList.toggle('on', state.demoMode);
+  btn.textContent = state.demoMode ? '演示模式已开 · 点击关闭' : '用预置结果演示';
+  $('demoNote').style.display = state.demoMode ? '' : 'none';
+  if (state.demoMode) {
+    fillDemoInputs();
+  }
+}
+
+function fillDemoInputs() {
+  state.rawText = DEMO_RAW;
+  state.jdText = DEMO_JD;
+  $('rawText').value = DEMO_RAW;
+  $('jdText').value = DEMO_JD;
+  onJdInput();
+  const btn = $('btnParse');
+  if (btn) {
+    // 必须同时解除 disabled 属性 —— 只去掉 .dis 类按钮仍然点不动
+    btn.classList.remove('dis');
+    btn.disabled = false;
+  }
+}
+
+$('btnDemoToggle').onclick = () => toggleDemoMode();
+$('btnDemoFill').onclick = () => {
+  fillDemoInputs();
+  go('s2');
+};
+
+/* ---------- 内测：参与者信息 ---------- */
+(function initBeta() {
+  const pidInput = $('betaPid');
+  const trackBox = $('betaTracks');
+  if (!pidInput || !trackBox) return;
+
+  // 编号存在 localStorage 里，同一个人换设备也能续上（只存匿名编号）
+  try {
+    const saved = localStorage.getItem('zhiya.beta.pid');
+    if (saved) {
+      pidInput.value = saved;
+      state.participant = saved;
+    }
+    const savedTrack = localStorage.getItem('zhiya.beta.track');
+    if (savedTrack) {
+      state.track = savedTrack;
+      trackBox.querySelectorAll('.betaTrack').forEach((b) => {
+        b.classList.toggle('on', b.getAttribute('data-track') === savedTrack);
+      });
+    }
+  } catch (_) { /* localStorage 不可用时忽略 */ }
+
+  pidInput.addEventListener('input', () => {
+    const v = pidInput.value.trim();
+    state.participant = v;
+    try {
+      if (v) localStorage.setItem('zhiya.beta.pid', v);
+      else localStorage.removeItem('zhiya.beta.pid');
+    } catch (_) { /* ignore */ }
+    // 填了编号才算进入漏斗（没填的用户不计入统计）
+    if (v) telemetry('visit', { track: state.track });
+  });
+
+  trackBox.querySelectorAll('.betaTrack').forEach((b) => {
+    b.onclick = () => {
+      const t = b.getAttribute('data-track');
+      state.track = state.track === t ? '' : t;
+      trackBox.querySelectorAll('.betaTrack').forEach((x) => {
+        x.classList.toggle('on', x.getAttribute('data-track') === state.track);
+      });
+      try {
+        if (state.track) localStorage.setItem('zhiya.beta.track', state.track);
+        else localStorage.removeItem('zhiya.beta.track');
+      } catch (_) { /* ignore */ }
+      telemetry('visit', { track: state.track });
+    };
+  });
+})();
+
+/* ---------- 内测：反馈问卷 ---------- */
+(function initFeedback() {
+  const rateBox = $('fbRate');
+  if (!rateBox) return;
+
+  rateBox.querySelectorAll('.fbR').forEach((b) => {
+    b.onclick = () => {
+      rateBox.querySelectorAll('.fbR').forEach((x) => x.classList.remove('on'));
+      b.classList.add('on');
+      state.fb.overall = Number(b.getAttribute('data-v'));
+      refreshFbBtn();
+    };
+  });
+
+  // 单选组
+  const effortBox = $('fbEffort');
+  effortBox.querySelectorAll('.fbC2').forEach((b) => {
+    b.onclick = () => {
+      effortBox.querySelectorAll('.fbC2').forEach((x) => x.classList.remove('on'));
+      b.classList.add('on');
+      state.fb.effort_minutes = Number(b.getAttribute('data-v'));
+      refreshFbBtn();
+    };
+  });
+
+  const recBox = $('fbRec');
+  recBox.querySelectorAll('.fbC2').forEach((b) => {
+    b.onclick = () => {
+      recBox.querySelectorAll('.fbC2').forEach((x) => x.classList.remove('on'));
+      b.classList.add('on');
+      state.fb.would_recommend = b.getAttribute('data-v');
+      refreshFbBtn();
+    };
+  });
+
+  // 多选组
+  const bindChecks = (boxId, key) => {
+    const box = $(boxId);
+    box.querySelectorAll('input[type=checkbox]').forEach((cb) => {
+      cb.onchange = () => {
+        state.fb[key] = [...box.querySelectorAll('input:checked')].map((x) => x.value);
+        refreshFbBtn();
+      };
+    });
+  };
+  bindChecks('fbUseful', 'useful_parts');
+  bindChecks('fbPain', 'pain_points');
+
+  $('fbQuote').addEventListener('input', (e) => {
+    state.fb.quote = e.target.value.trim();
+    refreshFbBtn();
+  });
+
+  function refreshFbBtn() {
+    const enough = state.fb.overall > 0;
+    $('btnFb').disabled = !enough;
+    $('btnFb').classList.toggle('dis', !enough);
+  }
+
+  $('btnFb').onclick = async () => {
+    const btn = $('btnFb');
+    btn.disabled = true;
+    btn.classList.add('dis');
+    btn.textContent = '提交中…';
+
+    // 离线单文件版没有后端，直接本地确认，不发请求（否则控制台报 fetch 失败）
+    if (IS_FILE_PROTOCOL) {
+      btn.textContent = '已提交，谢谢你！';
+      setTimeout(() => { go('s6'); }, 900);
+      return;
+    }
+
+    try {
+      const res = await fetch(apiUrl('/api/feedback'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          participant: state.participant,
+          track: state.track,
+          feedback: state.fb,
+        }),
+      });
+      const { ok } = await parseResponse(res);
+      if (ok) {
+        telemetry('feedback');
+        btn.textContent = '已提交，谢谢你！';
+        setTimeout(() => { go('s6'); }, 900);
+      } else {
+        btn.textContent = '提交失败，重试';
+        btn.disabled = false;
+        btn.classList.remove('dis');
+      }
+    } catch (e) {
+      btn.textContent = '提交失败，重试';
+      btn.disabled = false;
+      btn.classList.remove('dis');
+    }
+  };
+
+  refreshFbBtn();
+})();
+
+/* ---------- 初始化 ---------- */
+onJdInput();
+$('hours').dispatchEvent(new Event('input'));
+go('s1');
+
+/* 启动即探测后端，把连接状态直接摆在首页，
+   避免用户填完一堆内容才发现接口不通。 */
+(async function init() {
+  const base = await detectApiBase();
+  const hint = $('connHint');
+  // 注意：base 为空字符串代表「同源可用」，是有效结果，不能用 if (base) 判断
+  const connected = base !== null;
+  if (connected) {
+    const where = base ? base.replace(/^https?:\/\//, '') : '同源';
+    hint.innerHTML = `<span style="color:var(--have-t)">●</span> 已连接知涯后端（${where}）`;
+    hint.classList.remove('bad');
+  } else {
+    hint.innerHTML = '<span style="color:var(--err)">●</span> 未连接到知涯后端 —— 请用 http://127.0.0.1:5178 打开本页，或先执行 bash start.sh';
+    hint.classList.add('bad');
+  }
+})();
+
+</script>
+</body>
+</html>
