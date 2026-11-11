@@ -8,10 +8,10 @@ import crypto from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { initCloud, retryState } from './cloud.js';
+import { initCloud, retryState, beginProgress, endProgress, getProgress } from './cloud.js';
 import { normalizeTextInput, normalizeWeeklyHours } from './sanitize.js';
 import {
-  runPipeline, runDirections, deriveScope, diffResults, STEPS,
+  runPipeline, runDirections, runDirectionsWithStatus, deriveScope, diffResults, STEPS,
 } from './pipeline.js';
 import {
   track, trackResult, trackFeedback, summarize, FUNNEL_STEPS,
@@ -216,6 +216,9 @@ app.post('/api/analysis', async (req, res) => {
     }
 
     const action = String(body.action || 'analyze');
+    // 优先用前端传来的 requestId —— 前端要用它轮询进度。
+    // 没有就自己生成（直接调 API 时也保证有 id）。
+    const requestId = String(body.requestId || '').trim() || crypto.randomUUID();
     const state = {
       raw_text: rawText,
       followups: Array.isArray(body.followups) ? body.followups.slice(0, 2) : [],
@@ -223,7 +226,10 @@ app.post('/api/analysis', async (req, res) => {
       target_role: targetRole,
       weekly_hours: normalizeWeeklyHours(body.weekly_hours, 10),
       model: body.model || undefined,
+      requestId,   // 用于进度查询：前端轮询这个 id 就能知道跑到第几步、有没有在重试
     };
+
+    beginProgress(requestId);
 
     // 单条重算：只重算某条差距
     if (action === 'recheck' && body.recheck_item) {
@@ -240,11 +246,15 @@ app.post('/api/analysis', async (req, res) => {
     await runPipeline(state, { scope });
 
     // 方向候选（依赖 profile + jd）
+    let directionsFailed = false;
     if (state.profile && state.jd_profile) {
-      state.directions = await runDirections(state, state.model);
+      const r = await runDirectionsWithStatus(state, state.model);
+      state.directions = r.list;
+      directionsFailed = r.failed;
     }
 
     const resultId = saveResult(state);
+    endProgress(requestId);   // 请求结束，清理进度状态
 
     // 内测数据采集：只记匿名编号与结构化摘要，不记任何身份信息
     const participant = String(body.participant || '').trim();
@@ -270,10 +280,14 @@ app.post('/api/analysis', async (req, res) => {
         elapsed_ms: Date.now() - started,
         model: state.model || 'auto',
         retries: retryState.attempts,
+        // 方向推荐失败时透出状态，让前端能给出「网络问题，能力差距分析仍可用」
+        // 而不是让用户面对一片空白
+        directions_failed: directionsFailed,
       },
     });
   } catch (err) {
     console.error('[analysis 失败]', err?.message);
+    endProgress(requestId);   // 失败也要清理，否则进度表会残留
     const isTimeout = err?.code === 'model_timeout';
     res.status(isTimeout ? 504 : 500).json({
       error: isTimeout ? 'model_timeout' : 'analysis_failed',
@@ -370,6 +384,31 @@ app.post('/api/analysis/regenerate', async (req, res) => {
       detail: String(err?.message || err),
     });
   }
+});
+
+/* ---------- 进度查询（让等待期可感知） ---------- */
+
+/**
+ * GET /api/progress?requestId=xxx
+ * 前端在等待分析结果时轮询这个接口，能实时看到：
+ *   - 当前跑到四步中的第几步
+ *   - 是否正在重试（网络不稳时会重试 2 次，耗时可能翻倍）
+ */
+app.get('/api/progress', (req, res) => {
+  const requestId = String(req.query.requestId || '');
+  const p = getProgress(requestId);
+  if (!p) {
+    res.json({ found: false });
+    return;
+  }
+  res.json({
+    found: true,
+    step: p.step,
+    attempts: p.attempts,
+    retrying: p.attempts > 0,
+    elapsed_ms: Date.now() - p.startedAt,
+    last_error: p.lastError ? p.lastError.slice(0, 120) : '',
+  });
 });
 
 /* ---------- 内测数据采集接口 ---------- */

@@ -233,3 +233,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .fbC2:hover{border-color:var(--blue2)}
 .fbC2.on{background:var(--blue);border-color:var(--blue);color:#fff}
 .fbTa{min-height:88px}
+
+/* ---------- 进度提示（等待期可感知） ---------- */
+.loadnote{margin-top:16px;font-size:11.5px;color:var(--t3);line-height:1.7;text-align:left}

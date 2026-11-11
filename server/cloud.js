@@ -123,6 +123,50 @@ export const retryState = {
   },
 };
 
+/* ---------- 并发隔离的重试状态 ----------
+ *
+ * retryState 是全局单例：多个请求并发时会互相覆盖状态，
+ * A 请求在重试时，B 请求读到的却是 B 自己的计数，用户看到错误的重试提示。
+ * 这里用 requestId 把每个请求的进度隔离开。
+ */
+const progressMap = new Map();   // requestId -> { attempts, lastError, startedAt, step }
+const PROGRESS_TTL_MS = 5 * 60 * 1000;
+
+/** 开启一个请求的进度追踪 */
+export function beginProgress(requestId) {
+  progressMap.set(requestId, {
+    attempts: 0,
+    lastError: '',
+    startedAt: Date.now(),
+    step: '解析中',
+  });
+  // 顺手清理过期的，避免长时间运行内存增长
+  const now = Date.now();
+  for (const [k, v] of progressMap) {
+    if (now - v.startedAt > PROGRESS_TTL_MS) progressMap.delete(k);
+  }
+}
+
+/** 更新某个请求的进度 */
+export function updateProgress(requestId, patch) {
+  if (!requestId) return;
+  const p = progressMap.get(requestId);
+  if (!p) return;
+  if (patch.attempts !== undefined) p.attempts = patch.attempts;
+  if (patch.lastError !== undefined) p.lastError = patch.lastError;
+  if (patch.step !== undefined) p.step = patch.step;
+}
+
+/** 结束某个请求的进度追踪 */
+export function endProgress(requestId) {
+  if (requestId) progressMap.delete(requestId);
+}
+
+/** 读取某个请求的进度 */
+export function getProgress(requestId) {
+  return progressMap.get(requestId) || null;
+}
+
 /**
  * 调用模型并要求返回 JSON 对象
  *
@@ -161,6 +205,13 @@ export async function callModelForJson(opts) {
       lastErr = err;
       if (attempt >= maxRetries || !isRetryableError(err)) throw err;
       retryState.note(err);
+      // 同步到请求级进度，让前端能实时看到「正在重试」
+      if (opts.requestId) {
+        updateProgress(opts.requestId, {
+          attempts: attempt + 1,
+          lastError: String(err?.message || err),
+        });
+      }
       const delay = 800 * Math.pow(2, attempt);
       console.warn(`[模型重试] 第 ${attempt + 1} 次失败（${err.message}），${delay}ms 后重试`);
       await new Promise((r) => setTimeout(r, delay));

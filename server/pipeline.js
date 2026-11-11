@@ -4,7 +4,7 @@
  * ① 经历解析 → ② JD 解析 → ③ 差距对照 → ④ 计划生成
  * 后一步只吃前一步的结构化产物，这是「AI 不编造用户经历」的工程约束（R-12）。
  */
-import { callModelForJson, callModel } from './cloud.js';
+import { callModelForJson, callModel, updateProgress } from './cloud.js';
 import { stripDangerousMarkup } from './sanitize.js';
 import {
   PROFILE_SYSTEM, JD_SYSTEM, GAP_SYSTEM, PLAN_SYSTEM, REGEN_NOTE,
@@ -81,7 +81,7 @@ async function runProfile(state, model) {
       content: `【用户原始叙述】\n${rawText}${followupText}\n\n请输出个人背景档案 JSON。`,
     },
   ];
-  const raw = await callModelForJson({ model, messages, timeoutMs: 60000, temperature: 0.2 });
+  const raw = await callModelForJson({ model, messages, timeoutMs: 60000, temperature: 0.2, requestId: state.requestId });
   const profile = validateProfile(raw);
 
   // 追问缺口检查：模型未识别出缺失项时，用原文关键词做一次补充判断
@@ -110,7 +110,7 @@ async function runJd(state, model) {
       content: `【目标岗位 JD】\n${jdText}${roleHint}\n\n请输出岗位能力清单 JSON。`,
     },
   ];
-  const raw = await callModelForJson({ model, messages, timeoutMs: 60000, temperature: 0.2 });
+  const raw = await callModelForJson({ model, messages, timeoutMs: 60000, temperature: 0.2, requestId: state.requestId });
   const jd = validateJdProfile(raw, jdText);
   if (jd.role_name && !state.target_role) {
     state.target_role = jd.role_name;
@@ -144,7 +144,7 @@ async function runGap(state, model, { regen = false } = {}) {
         `请逐条对照输出差距报告 JSON。`,
     },
   ];
-  const raw = await callModelForJson({ model, messages, timeoutMs: 90000, temperature: 0.2 });
+  const raw = await callModelForJson({ model, messages, timeoutMs: 90000, temperature: 0.2, requestId: state.requestId });
   const gap = validateGapReport(raw, profile, jd);
   return gap;
 }
@@ -172,7 +172,7 @@ async function runPlan(state, model, { regen = false } = {}) {
         `请生成两周行动计划 JSON。`,
     },
   ];
-  const raw = await callModelForJson({ model, messages, timeoutMs: 90000, temperature: 0.3 });
+  const raw = await callModelForJson({ model, messages, timeoutMs: 90000, temperature: 0.3, requestId: state.requestId });
   const plan = validateActionPlan(raw, gap, weeklyHours);
   return plan;
 }
@@ -190,19 +190,32 @@ export async function runPipeline(state, { scope = ALL_STEPS, regen = false } = 
   const trace = [];
 
   // 依序执行，保证依赖成立
+  // 每步开始前上报进度，前端据此显示「当前在第几步」，
+  // 避免长耗时期间用户以为卡死。
+  const STEP_LABEL = {
+    [STEPS.PROFILE]: '正在解析你的经历',
+    [STEPS.JD]: '正在拆解岗位要求',
+    [STEPS.GAP]: '正在逐条对照能力差距',
+    [STEPS.PLAN]: '正在生成两周行动计划',
+  };
+
   if (steps.includes(STEPS.PROFILE)) {
+    if (state.requestId) updateProgress(state.requestId, { step: STEP_LABEL[STEPS.PROFILE] });
     state.profile = await runProfile(state, model);
     trace.push({ step: STEPS.PROFILE, ok: true });
   }
   if (steps.includes(STEPS.JD)) {
+    if (state.requestId) updateProgress(state.requestId, { step: STEP_LABEL[STEPS.JD] });
     state.jd_profile = await runJd(state, model);
     trace.push({ step: STEPS.JD, ok: true });
   }
   if (steps.includes(STEPS.GAP)) {
+    if (state.requestId) updateProgress(state.requestId, { step: STEP_LABEL[STEPS.GAP] });
     state.gap_report = await runGap(state, model, { regen });
     trace.push({ step: STEPS.GAP, ok: true });
   }
   if (steps.includes(STEPS.PLAN)) {
+    if (state.requestId) updateProgress(state.requestId, { step: STEP_LABEL[STEPS.PLAN] });
     state.action_plan = await runPlan(state, model, { regen });
     trace.push({ step: STEPS.PLAN, ok: true });
   }
@@ -253,7 +266,7 @@ export async function runDirections(state, model) {
   ];
 
   try {
-    const raw = await callModelForJson({ model, messages, timeoutMs: 60000, temperature: 0.3 });
+    const raw = await callModelForJson({ model, messages, timeoutMs: 60000, temperature: 0.3, requestId: state.requestId });
     const list = Array.isArray(raw?.directions) ? raw.directions : [];
     return list.slice(0, 3).map((d) => ({
       role: String(d?.role || '').trim(),
@@ -268,6 +281,19 @@ export async function runDirections(state, model) {
     console.warn(`[directions] 生成失败，已降级为空：${e?.message}`);
     return [];
   }
+}
+
+/**
+ * 生成方向候选，并回报是否失败。
+ *
+ * 与 runDirections 的区别：失败时返回 failed=true，
+ * 让上层能把「模型没给出」和「调用失败」区分开 ——
+ * 这两种情况给用户的提示文案完全不同。
+ */
+export async function runDirectionsWithStatus(state, model) {
+  const list = await runDirections(state, model);
+  const failed = list.length === 0 && Boolean(state.profile) && Boolean(state.jd_profile);
+  return { list, failed };
 }
 
 /** 计算两次结果的逐条差异 */

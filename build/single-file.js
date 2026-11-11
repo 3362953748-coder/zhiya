@@ -90,7 +90,14 @@ const OUT_FILE = resolve(OUT_DIR, '知涯最终版.html');
 mkdirSync(OUT_DIR, { recursive: true });
 writeFileSync(OUT_FILE, out, 'utf-8');
 
+// 同时写回仓库，保证 GitHub 上的 demo-offline.html 与桌面版一致。
+// 以前只写桌面版，导致仓库里那份长期停留在旧版本（不含内测模式），
+// 面试官从 GitHub 拿到的离线版和线上行为不一致。
+const REPO_FILE = resolve(ROOT, 'demo-offline.html');
+writeFileSync(REPO_FILE, out, 'utf-8');
+
 console.log(`✔ 单文件最终版已生成：${OUT_FILE}`);
 console.log(`  体积 ${(Buffer.byteLength(out) / 1024).toFixed(1)} KB`);
 console.log(`  内置快照：${snapshot.result.gap_report.items.length} 项能力 · ${snapshot.result.action_plan.tasks.length} 个任务`);
 console.log(`  版本 ${VERSION} · ${BUILD_TIME}`);
+console.log(`  仓库同步：${REPO_FILE}`);

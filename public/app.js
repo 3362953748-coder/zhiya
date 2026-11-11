@@ -135,9 +135,15 @@ const $ = (id) => document.getElementById(id);
 /* ---------- 内测埋点 ----------
  * 只上报匿名编号 + 节点名，不含任何身份信息。
  * 上报失败绝不打扰用户（静默忽略）。
+ *
+ * 离线单文件版（file:// 协议）下完全没有后端，此时直接跳过，
+ * 否则控制台会刷一串 net::ERR_CONNECTION_REFUSED，演示时很难看。
  */
+const IS_FILE_PROTOCOL = location.protocol === 'file:';
+
 function telemetry(step, meta) {
   if (!state.participant) return;
+  if (IS_FILE_PROTOCOL) return;   // 离线版无后端，不埋点
   try {
     fetch(`${apiUrl('/api/telemetry')}`, {
       method: 'POST',
@@ -292,6 +298,7 @@ function showLoading(msg, sub) {
             <span class="dot"></span><span>${s[1]}</span>
           </div>`).join('')}
       </div>
+      <div class="loadnote" id="loadNote">正在提交…</div>
     </div>`;
   $('s8foot').innerHTML = '<div class="fnote">通常需要 20–40 秒，请不要关闭</div>';
   $('back8').onclick = () => go('s2');
@@ -304,6 +311,64 @@ function markStep(step, done) {
   if (!el) return;
   el.classList.toggle('on', !done);
   el.classList.toggle('done', done);
+}
+
+/* ---------- 进度轮询 ----------
+ * 分析要跑 20–90 秒（网络不稳时模型会重试，耗时可能翻倍）。
+ * 只显示一个转圈会让用户以为卡死，所以轮询后端进度接口：
+ *   - 实时点亮对应的步骤（用户知道跑到第几步了）
+ *   - 正在重试时明确告知「网络不稳，正在重试」
+ *
+ * 后端返回的是中文步骤文案，这里映射回前端的 step key。
+ */
+const BACKEND_STEP_TO_KEY = {
+  '正在解析你的经历': 'profile',
+  '正在拆解岗位要求': 'jd_profile',
+  '正在逐条对照能力差距': 'gap_report',
+  '正在生成两周行动计划': 'action_plan',
+};
+
+let progressTimer = null;
+
+function startProgressPolling(requestId) {
+  stopProgressPolling();
+  if (!requestId || IS_FILE_PROTOCOL) return;
+
+  progressTimer = setInterval(async () => {
+    try {
+      const res = await fetch(apiUrl(`/api/progress?requestId=${encodeURIComponent(requestId)}`));
+      if (!res.ok) return;
+      const p = await res.json();
+      if (!p.found) return;
+
+      // 点亮当前步骤
+      const key = BACKEND_STEP_TO_KEY[p.step];
+      if (key) {
+        STEP_LABELS.forEach(([k]) => {
+          if (k === key) markStep(k, false);
+        });
+      }
+
+      // 重试中：把提示写进加载页，用户知道不是卡死
+      const note = $('loadNote');
+      if (note) {
+        if (p.retrying) {
+          note.textContent = `网络不稳，正在自动重试（第 ${p.attempts} 次）…请不要关闭`;
+          note.style.color = 'var(--up-t)';
+        } else if (p.step) {
+          note.textContent = `当前进度：${p.step}　已等待 ${Math.round(p.elapsed_ms / 1000)} 秒`;
+          note.style.color = '';
+        }
+      }
+    } catch (_) { /* 轮询失败不影响主流程 */ }
+  }, 1500);
+}
+
+function stopProgressPolling() {
+  if (progressTimer) {
+    clearInterval(progressTimer);
+    progressTimer = null;
+  }
 }
 
 /* ---------- 主流程 ---------- */
@@ -344,6 +409,10 @@ async function startAnalysis(opts = {}) {
     }
   }
 
+  // 生成 requestId，让前端能轮询后端进度（第几步、有没有在重试）
+  const requestId = (crypto.randomUUID ? crypto.randomUUID()
+    : `req-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+
   try {
     const res = await fetch(apiUrl('/api/analysis'), {
       method: 'POST',
@@ -358,9 +427,15 @@ async function startAnalysis(opts = {}) {
         // 内测采集：匿名编号与方向，用于算漏斗与效果指标
         participant: state.participant || undefined,
         track: state.track || undefined,
+        requestId,
       }),
     });
+
+    // 请求已发出，开始轮询进度
+    startProgressPolling(requestId);
+
     const { ok, data } = await parseResponse(res);
+    stopProgressPolling();
 
     if (!ok) {
       showError({
@@ -374,6 +449,7 @@ async function startAnalysis(opts = {}) {
 
     applyResult(data);
   } catch (err) {
+    stopProgressPolling();
     showError(explainError(err, '解析失败，请重试。'));
   }
 }
@@ -400,7 +476,7 @@ function applyResult(data, bannerText) {
   state.baseResultId = data.result_id || 'builtin';
 
   renderJd(data.jd_profile);
-  renderDirections(data.directions);
+  renderDirections(data.directions, data.meta?.directions_failed);
   renderGap(data.gap_report, data.jd_profile);
   renderPlan(data.action_plan);
 
@@ -506,10 +582,15 @@ function renderJd(jd) {
 /* ---------- 渲染：方向卡 ---------- */
 const LEVEL_TAG = { '匹配度较高': 'th', '可尝试': 'tu', '可探索': 'tk' };
 
-function renderDirections(list) {
+function renderDirections(list, directionsFailed) {
   const box = $('dirList');
   if (!list || !list.length) {
-    box.innerHTML = `<div class="card"><div class="l2">这次没能给出可靠的方向建议，建议在下方补充更具体的经历后重试。</div></div>`;
+    // 区分两种空态：模型调用失败 vs 模型确实没给出方向。
+    // 前者是网络/服务问题，用户重试有意义；后者是信息不足，要引导补充经历。
+    box.innerHTML = directionsFailed
+      ? `<div class="card"><div class="l2">方向建议这次没生成出来（网络或模型服务波动）。
+         <br>能力差距分析与行动计划不受影响，可以继续往下看；要新的方向建议稍后重试即可。</div></div>`
+      : `<div class="card"><div class="l2">这次没能给出可靠的方向建议，建议在下方补充更具体的经历后重试。</div></div>`;
     $('dirCount').textContent = '0 个';
     return;
   }
@@ -807,7 +888,11 @@ function fillDemoInputs() {
   $('jdText').value = DEMO_JD;
   onJdInput();
   const btn = $('btnParse');
-  if (btn) btn.classList.remove('dis');
+  if (btn) {
+    // 必须同时解除 disabled 属性 —— 只去掉 .dis 类按钮仍然点不动
+    btn.classList.remove('dis');
+    btn.disabled = false;
+  }
 }
 
 $('btnDemoToggle').onclick = () => toggleDemoMode();
@@ -929,6 +1014,14 @@ $('btnDemoFill').onclick = () => {
     btn.disabled = true;
     btn.classList.add('dis');
     btn.textContent = '提交中…';
+
+    // 离线单文件版没有后端，直接本地确认，不发请求（否则控制台报 fetch 失败）
+    if (IS_FILE_PROTOCOL) {
+      btn.textContent = '已提交，谢谢你！';
+      setTimeout(() => { go('s6'); }, 900);
+      return;
+    }
+
     try {
       const res = await fetch(apiUrl('/api/feedback'), {
         method: 'POST',
